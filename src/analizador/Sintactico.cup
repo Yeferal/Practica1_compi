@@ -1,0 +1,41 @@
+//codigo usuario
+package analizador
+import java.cup.runtime.Symbol;
+import java.util.LinkedList;
+
+//Codigo para el parser, variables, metodos
+parser code
+{:
+    public static LinkedList<Error> tablaErrorLexico = new LinkedList<Error>();
+    
+    public void syntaxError(Symbol s){
+    String lexema = s.value.toString();
+    int fila = s.right;
+    int columna = s.left;
+    
+    System.out.println("====== Error Sinstactico =====");
+    System.out.println("Lexema: "+lexema);
+    System.out.println("Fila: "+fila);
+    System.out.println("Columna: "+columna);
+
+    }
+:}
+
+//Coidgo para las acciones gramaticales
+
+action code
+{:
+:}
+
+//Declaraciones 
+terminal PROYECTO, NOMBRE,ARCHIVO,CARPETA,UBICACION, MENOR,MAYOR,COMILLAS,DIAGONAL,IGUAL,NUMERO,CARACTERES,PALABRA,Ruta;
+
+// declaracion no terminales
+non terminal String INICIO, E;
+
+//presedencia de menor a mayor
+precedenc left NOMBRE, PALABRA;
+
+
+
+
