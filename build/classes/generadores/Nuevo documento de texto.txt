@@ -1,5 +1,8 @@
 <PROYECTO nombre="prueba">
-	<ARCHIVO nombre="archi" ubicacion="\hola.csv">
-	<ARCHIVO nombre="archivo" ubicacion="\holas.csv">
+	<ARCHIVO nombre="archi" ubicacion="/hola/hola"/>
+	<ARCHIVO nombre="archivo" ubicacion="/hola/hola"/>
 	<CARPETA>
+		<ARCHIVO nombre="archi" ubicacion="\hola.csv"/>
+		<ARCHIVO nombre="archivo" ubicacion="\holas.csv"/>
 	</CARPETA>
+</PROYECTO>

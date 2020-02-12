@@ -1,6 +1,6 @@
 //codigo usuario
-package analizador
-import java.cup.runtime.Symbol;
+package analizador;
+import java_cup.runtime.Symbol;
 import java.util.LinkedList;
 
 //Codigo para el parser, variables, metodos
@@ -18,7 +18,7 @@ parser code
     System.out.println("Fila: "+fila);
     System.out.println("Columna: "+columna);
 
-    }
+    } 
 :}
 
 //Coidgo para las acciones gramaticales
@@ -28,14 +28,33 @@ action code
 :}
 
 //Declaraciones 
-terminal PROYECTO, NOMBRE,ARCHIVO,CARPETA,UBICACION, MENOR,MAYOR,COMILLAS,DIAGONAL,IGUAL,NUMERO,CARACTERES,PALABRA,Ruta;
+terminal PROYECTO, NOMBRE,ARCHIVO,CARPETA,UBICACION, MENOR,MAYOR,COMILLAS,DIAGONAL,IGUAL,NUMERO,CARACTERES,PALABRA;
 
 // declaracion no terminales
-non terminal String INICIO, E;
+non terminal String INICIO, TIPO_ENTRADA,TIPO_ARCHIVO,TIPO_CARPETA,TIPO_CERRAR,PATHS;
 
 //presedencia de menor a mayor
-precedenc left NOMBRE, PALABRA;
+precedence left NOMBRE, PALABRA;
 
 
+start with INICIO;
 
+//Reglas Semanticas
 
+INICIO::= MENOR TIPO_ENTRADA;
+
+TIPO_ENTRADA::= PROYECTO NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra proyecto: "+a); :}COMILLAS MAYOR
+               |TIPO_ARCHIVO
+               |TIPO_CARPETA
+               |TIPO_CERRAR;
+
+TIPO_ARCHIVO::= ARCHIVO NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra archivo: "+a); :}COMILLAS PATHS COMILLAS DIAGONAL MAYOR;
+
+TIPO_CARPETA::= CARPETA NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra carpeta: "+a); :}COMILLAS PATHS COMILLAS MAYOR;
+
+TIPO_CERRAR::= DIAGONAL PROYECTO MAYOR
+              |DIAGONAL CARPETA MAYOR;
+
+PATHS::= DIAGONAL PALABRA DIAGONAL PALABRA:rutaPath {:  System.out.println("ruta Encontrada: "+rutaPath); RESULT = rutaPath; :};
+               
+               

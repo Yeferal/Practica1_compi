@@ -42,13 +42,14 @@ identificador   = [a-zA-Z]+
 */
 
 
-PROYECTO   {return new Symbol(Simbolos.PROYECTO , yycolumn, yyline, yytext());}
-nombre     {return new Symbol(Simbolos.NOMBRE , yycolumn, yyline, yytext());}
-ARCHIVO    {return new Symbol(Simbolos.ARCHIVO , yycolumn, yyline, yytext());}
-CARPETA    {return new Symbol(Simbolos.CARPETA , yycolumn, yyline, yytext());}
-ubicacion  {return new Symbol(Simbolos.UBICACION , yycolumn, yyline, yytext());}
+PROYECTO   {System.out.println("proyecto"); return new Symbol(Simbolos.PROYECTO , yycolumn, yyline, yytext());}
+nombre     {System.out.println("nombre"); return new Symbol(Simbolos.NOMBRE , yycolumn, yyline, yytext());}
+ARCHIVO    {System.out.println("archivo"); return new Symbol(Simbolos.ARCHIVO , yycolumn, yyline, yytext());}
+CARPETA    {System.out.println("carpeta"); return new Symbol(Simbolos.CARPETA , yycolumn, yyline, yytext());}
+ubicacion  {System.out.println("ubicacion"); return new Symbol(Simbolos.UBICACION , yycolumn, yyline, yytext());}
 
 <YYINITIAL> {
+    {Espacio}    {/*Ignore*/}
     "<"          {System.out.println("menor que"); return new Symbol(Simbolos.MENOR , yycolumn, yyline, yytext());}
     ">"          {System.out.println("mayor que"); return new Symbol(Simbolos.MAYOR , yycolumn, yyline, yytext());}
     "\""         {System.out.println("comillas"); return new Symbol(Simbolos.COMILLAS , yycolumn, yyline, yytext());}
