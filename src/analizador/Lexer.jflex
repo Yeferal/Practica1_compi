@@ -27,8 +27,8 @@ Letra           = [a-zA-Z]
 Palabra         = {Letra} {Letra}*
 Digito          = [0-9]
 Numero          = {Digito} {Digito}*
-Espacio         = [ , \t, \r, \n]+
-//Ruta            = ({Palabra} {\})*{Palabra}{.csv}
+Espacio         = [ \t\r\n]+
+Ruta            = ([Palabra | \\])+
 %%
 
 
@@ -48,6 +48,7 @@ ARCHIVO    {System.out.println("archivo"); return new Symbol(Simbolos.ARCHIVO , 
 CARPETA    {System.out.println("carpeta"); return new Symbol(Simbolos.CARPETA , yycolumn, yyline, yytext());}
 ubicacion  {System.out.println("ubicacion"); return new Symbol(Simbolos.UBICACION , yycolumn, yyline, yytext());}
 
+
 <YYINITIAL> {
     {Espacio}    {/*Ignore*/}
     "<"          {System.out.println("menor que"); return new Symbol(Simbolos.MENOR , yycolumn, yyline, yytext());}
@@ -59,7 +60,7 @@ ubicacion  {System.out.println("ubicacion"); return new Symbol(Simbolos.UBICACIO
     {Numero}     {System.out.println("numero"); return new Symbol(Simbolos.NUMERO , yycolumn, yyline, yytext());}
     {Caracteres} {System.out.println("caracter"); return new Symbol(Simbolos.CARACTERES , yycolumn, yyline, yytext());}
     {Palabra}    {System.out.println("palabra"); return new Symbol(Simbolos.PALABRA , yycolumn, yyline, yytext());}
-    //{Ruta}       {System.out.println("ruta"); return new Symbol(Simbolos.Ruta , yycolumn, yyline, yytext());}
+    {Ruta}".csv"       {System.out.println("ruta"); return new Symbol(Simbolos.RUTA , yycolumn, yyline, yytext());}
     .            {System.out.println("error: "+"Columna: "+yycolumn+" linea: "+ yyline);
                  Error datos = new Error(yytext(),"Error Lexico","Simbolo invalido",yyline,yycolumn);
                  tablaErrorLexico.add(datos);}

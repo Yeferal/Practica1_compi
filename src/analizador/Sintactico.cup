@@ -6,7 +6,7 @@ import java.util.LinkedList;
 //Codigo para el parser, variables, metodos
 parser code
 {:
-    public static LinkedList<Error> tablaErrorLexico = new LinkedList<Error>();
+    /*public static LinkedList<Error> tablaErrorLexico = new LinkedList<Error>();
     
     public void syntaxError(Symbol s){
     String lexema = s.value.toString();
@@ -18,7 +18,17 @@ parser code
     System.out.println("Fila: "+fila);
     System.out.println("Columna: "+columna);
 
-    } 
+    } */
+
+    private Symbol s;
+    public void syntaError(Symbol s){
+        this.s = s;
+    }
+    public Symbol getS(Symbol s){
+        return this.s = s;
+    }
+
+
 :}
 
 //Coidgo para las acciones gramaticales
@@ -28,13 +38,13 @@ action code
 :}
 
 //Declaraciones 
-terminal PROYECTO, NOMBRE,ARCHIVO,CARPETA,UBICACION, MENOR,MAYOR,COMILLAS,DIAGONAL,IGUAL,NUMERO,CARACTERES,PALABRA;
+terminal PROYECTO, NOMBRE,ARCHIVO,CARPETA,UBICACION, MENOR,MAYOR,COMILLAS,DIAGONAL,IGUAL,NUMERO,CARACTERES,PALABRA,RUTA;
 
 // declaracion no terminales
-non terminal String INICIO, TIPO_ENTRADA,TIPO_ARCHIVO,TIPO_CARPETA,TIPO_CERRAR,PATHS;
+non terminal INICIO, TIPO_ENTRADA,TIPO_ARCHIVO,TIPO_CARPETA,TIPO_CERRAR,PATHS;
 
 //presedencia de menor a mayor
-precedence left NOMBRE, PALABRA;
+//precedence left NOMBRE, PALABRA;
 
 
 start with INICIO;
@@ -43,18 +53,19 @@ start with INICIO;
 
 INICIO::= MENOR TIPO_ENTRADA;
 
-TIPO_ENTRADA::= PROYECTO NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra proyecto: "+a); :}COMILLAS MAYOR
+TIPO_ENTRADA::= PROYECTO NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra proyecto: "+a); :} COMILLAS MAYOR
                |TIPO_ARCHIVO
                |TIPO_CARPETA
                |TIPO_CERRAR;
 
-TIPO_ARCHIVO::= ARCHIVO NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra archivo: "+a); :}COMILLAS PATHS COMILLAS DIAGONAL MAYOR;
+TIPO_ARCHIVO::= ARCHIVO NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra archivo: "+a); :} COMILLAS UBICACION IGUAL COMILLAS PATHS:b {: System.out.println("ruta: "+b); :} COMILLAS DIAGONAL MAYOR;
 
-TIPO_CARPETA::= CARPETA NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra carpeta: "+a); :}COMILLAS PATHS COMILLAS MAYOR;
+TIPO_CARPETA::= CARPETA NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra carpeta: "+a); :} COMILLAS UBICACION IGUAL COMILLAS PATHS:b {: System.out.println("ruta: "+b); :} COMILLAS MAYOR;
 
 TIPO_CERRAR::= DIAGONAL PROYECTO MAYOR
               |DIAGONAL CARPETA MAYOR;
 
-PATHS::= DIAGONAL PALABRA DIAGONAL PALABRA:rutaPath {:  System.out.println("ruta Encontrada: "+rutaPath); RESULT = rutaPath; :};
+PATHS::= PALABRA:rutaPath {:  System.out.println("ruta Encontrada: "+rutaPath); RESULT = rutaPath; :}
+        |RUTA;
                
                

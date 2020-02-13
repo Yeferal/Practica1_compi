@@ -2,7 +2,9 @@
 package inicio;
 
 import analizador.AnalizadorLexico;
+import analizador.AnalizadorLexico2;
 import analizador.AnalizadorSintactico;
+import analizador.AnalizadorSintactico2;
 import java.io.BufferedReader;
 import java.io.StringReader;
 
@@ -14,6 +16,16 @@ public class VentanaInicio extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
     }
+    
+    public void arbol(){
+        
+        
+        
+    }
+    
+    
+    
+    
 
 
     @SuppressWarnings("unchecked")
@@ -114,9 +126,9 @@ public class VentanaInicio extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String texto = textAreaConsulta.getText();
         
-        AnalizadorLexico lexico = new AnalizadorLexico(new BufferedReader(new StringReader(texto)));
+        AnalizadorLexico2 lexico = new AnalizadorLexico2(new StringReader(texto));
         
-        AnalizadorSintactico sintactico = new AnalizadorSintactico(lexico);
+        AnalizadorSintactico2 sintactico = new AnalizadorSintactico2(lexico);
         
         try {
             sintactico.parse();
