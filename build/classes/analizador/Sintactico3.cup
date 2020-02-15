@@ -38,7 +38,7 @@ action code
 :}
 
 //Declaraciones 
-terminal TEXTO, COMA;
+terminal TEXTO, COMA,LINEA;
 
 // declaracion no terminales
 non terminal INICIO,E;
@@ -51,6 +51,10 @@ start with INICIO;
 
 //Reglas Semanticas
 
-INICIO::= TEXTO E;
-
-E ::= COMA TEXTO E;
+INICIO::= TEXTO E
+          |TEXTO;
+          
+E ::= COMA TEXTO 
+      |COMA TEXTO E
+      |LINEA INICIO
+      |LINEA;

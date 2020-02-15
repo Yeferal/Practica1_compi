@@ -5,6 +5,8 @@ import analizador.AnalizadorLexico;
 import analizador.AnalizadorLexico2;
 import analizador.AnalizadorSintactico;
 import analizador.AnalizadorSintactico2;
+import analizador.AnalizadorLexico3;
+import analizador.AnalizadorSintactico3;
 import java.io.BufferedReader;
 import java.io.StringReader;
 
@@ -126,9 +128,10 @@ public class VentanaInicio extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String texto = textAreaConsulta.getText();
         
-        AnalizadorLexico2 lexico = new AnalizadorLexico2(new StringReader(texto));
+        AnalizadorLexico lexico = new AnalizadorLexico(new StringReader(texto));
         
-        AnalizadorSintactico2 sintactico = new AnalizadorSintactico2(lexico);
+        AnalizadorSintactico sintactico = new AnalizadorSintactico(lexico);
+        //sintactico.setVentana(this);
         
         try {
             sintactico.parse();
@@ -151,6 +154,6 @@ public class VentanaInicio extends javax.swing.JFrame {
     private javax.swing.JPanel panelDatos;
     private javax.swing.JScrollPane scrollArchivo;
     private javax.swing.JTextArea textAreaConsulta;
-    private javax.swing.JTextArea textAreaDatos;
+    public javax.swing.JTextArea textAreaDatos;
     // End of variables declaration//GEN-END:variables
 }

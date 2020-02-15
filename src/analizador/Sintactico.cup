@@ -2,11 +2,19 @@
 package analizador;
 import java_cup.runtime.Symbol;
 import java.util.LinkedList;
+import inicio.VentanaInicio;
 
 //Codigo para el parser, variables, metodos
 parser code
 {:
-    /*public static LinkedList<Error> tablaErrorLexico = new LinkedList<Error>();
+    /*
+    public VentanaInicio ventana;
+    public void setVentana(VentanaInicio ventana){
+    this.ventana = ventana;
+    
+    }
+
+    public static LinkedList<Error> tablaErrorLexico = new LinkedList<Error>();
     
     public void syntaxError(Symbol s){
     String lexema = s.value.toString();
@@ -35,13 +43,15 @@ parser code
 
 action code
 {:
+
+    
 :}
 
 //Declaraciones 
-terminal PROYECTO, NOMBRE,ARCHIVO,CARPETA,UBICACION, MENOR,MAYOR,COMILLAS,DIAGONAL,IGUAL,NUMERO,CARACTERES,PALABRA,RUTA;
+terminal PROYECTO, NOMBRE,ARCHIVO,CARPETA,UBICACION, MENOR,MAYOR,COMILLAS,DIAGONAL,IGUAL,NUMERO,CARACTERES,PALABRA,RUTA,CSV,PUNTO;
 
 // declaracion no terminales
-non terminal INICIO, TIPO_ENTRADA,TIPO_ARCHIVO,TIPO_CARPETA,TIPO_CERRAR,PATHS;
+non terminal INICIO, TIPO_ENTRADA,TIPO_ARCHIVO,TIPO_CARPETA,TIPO_CERRAR,PATHS,TIPO_PROYECTO,SEGUIDO;
 
 //presedencia de menor a mayor
 //precedence left NOMBRE, PALABRA;
@@ -51,21 +61,19 @@ start with INICIO;
 
 //Reglas Semanticas
 
-INICIO::= MENOR TIPO_ENTRADA;
+INICIO::= MENOR PROYECTO TIPO_PROYECTO;
 
-TIPO_ENTRADA::= PROYECTO NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra proyecto: "+a); :} COMILLAS MAYOR
-               |TIPO_ARCHIVO
-               |TIPO_CARPETA
-               |TIPO_CERRAR;
+SEGUIDO::= MENOR TIPO_ENTRADA;
 
-TIPO_ARCHIVO::= ARCHIVO NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra archivo: "+a); :} COMILLAS UBICACION IGUAL COMILLAS PATHS:b {: System.out.println("ruta: "+b); :} COMILLAS DIAGONAL MAYOR;
+TIPO_ENTRADA::= ARCHIVO TIPO_ARCHIVO
+               |CARPETA TIPO_CARPETA
+               |DIAGONAL TIPO_CERRAR;
 
-TIPO_CARPETA::= CARPETA NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra carpeta: "+a); :} COMILLAS UBICACION IGUAL COMILLAS PATHS:b {: System.out.println("ruta: "+b); :} COMILLAS MAYOR;
+TIPO_PROYECTO::= NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra proyecto: "+a);:} COMILLAS MAYOR SEGUIDO;
 
-TIPO_CERRAR::= DIAGONAL PROYECTO MAYOR
-              |DIAGONAL CARPETA MAYOR;
+TIPO_ARCHIVO::= NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra archivo: "+a); :} COMILLAS UBICACION IGUAL COMILLAS RUTA:b CSV:v {:System.out.println("ruta DE ARCHIVO: "+b+v); :} COMILLAS DIAGONAL MAYOR SEGUIDO;
 
-PATHS::= PALABRA:rutaPath {:  System.out.println("ruta Encontrada: "+rutaPath); RESULT = rutaPath; :}
-        |RUTA;
-               
-               
+TIPO_CARPETA::= NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra carpeta: "+a); :} COMILLAS MAYOR SEGUIDO;
+
+TIPO_CERRAR::= PROYECTO MAYOR
+              |CARPETA MAYOR SEGUIDO;

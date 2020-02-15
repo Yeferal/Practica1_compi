@@ -51,6 +51,7 @@ start with INICIO;
 
 //Reglas Semanticas
 
-INICIO::= TEXTO E;
+INICIO::= TEXTO E
+          |TEXTO;
 
-E ::= COMA TEXTO E;
+E ::= COMA TEXTO INICIO;

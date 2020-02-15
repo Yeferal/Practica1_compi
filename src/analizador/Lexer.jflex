@@ -6,7 +6,7 @@ import java.util.LinkedList;
 %{
     //coidgo de usuario en sintaxis java
 
-    public static LinkedList<Error> tablaErrorLexico = new LinkedList<Error>();
+    //public static LinkedList<Error> tablaErrorLexico = new LinkedList<Error>();
 %}
 
     //directivas
@@ -17,18 +17,21 @@ import java.util.LinkedList;
 %char
 %column
 %full
-%ignorecase
+//%ignorecase
 %line
 %unicode
 
     //expreciones regulares
+
+
 Caracteres      = [-_@+*#.]
 Letra           = [a-zA-Z]
 Palabra         = {Letra} {Letra}*
+//Ruta            = ([Palabra | \\])+
 Digito          = [0-9]
 Numero          = {Digito} {Digito}*
 Espacio         = [ \t\r\n]+
-Ruta            = ([Palabra | \\])+
+
 %%
 
 
@@ -51,19 +54,22 @@ ubicacion  {System.out.println("ubicacion"); return new Symbol(Simbolos.UBICACIO
 
 <YYINITIAL> {
     {Espacio}    {/*Ignore*/}
-    "<"          {System.out.println("menor que"); return new Symbol(Simbolos.MENOR , yycolumn, yyline, yytext());}
+    ".csv"        {System.out.println(".csv"); return new Symbol(Simbolos.CSV , yycolumn, yyline, yytext());}
+    ".."          {System.out.println("Punto"); return new Symbol(Simbolos.PUNTO , yycolumn, yyline, yytext());}   
+    /*{Ruta}       {System.out.println("ruta"); return new Symbol(Simbolos.RUTA , yycolumn, yyline, yytext());} */ 
+    "<"           {System.out.println("menor que"); return new Symbol(Simbolos.MENOR , yycolumn, yyline, yytext());}
     ">"          {System.out.println("mayor que"); return new Symbol(Simbolos.MAYOR , yycolumn, yyline, yytext());}
     "\""         {System.out.println("comillas"); return new Symbol(Simbolos.COMILLAS , yycolumn, yyline, yytext());}
     "/"          {System.out.println("diagonal"); return new Symbol(Simbolos.DIAGONAL , yycolumn, yyline, yytext());}
     "="          {System.out.println("igual"); return new Symbol(Simbolos.IGUAL , yycolumn, yyline, yytext());}
-
+    ("\\"({Palabra}|{Caracteres}|{Numero}))+         {System.out.println("ruta"); return new Symbol(Simbolos.RUTA , yycolumn, yyline, yytext());}
     {Numero}     {System.out.println("numero"); return new Symbol(Simbolos.NUMERO , yycolumn, yyline, yytext());}
     {Caracteres} {System.out.println("caracter"); return new Symbol(Simbolos.CARACTERES , yycolumn, yyline, yytext());}
     {Palabra}    {System.out.println("palabra"); return new Symbol(Simbolos.PALABRA , yycolumn, yyline, yytext());}
-    {Ruta}".csv"       {System.out.println("ruta"); return new Symbol(Simbolos.RUTA , yycolumn, yyline, yytext());}
+    
     .            {System.out.println("error: "+"Columna: "+yycolumn+" linea: "+ yyline);
-                 Error datos = new Error(yytext(),"Error Lexico","Simbolo invalido",yyline,yycolumn);
-                 tablaErrorLexico.add(datos);}
+                 /*Error datos = new Error(yytext(),"Error Lexico","Simbolo invalido",yyline,yycolumn);
+                 tablaErrorLexico.add(datos);*/}
     
 }
 
