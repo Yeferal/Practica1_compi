@@ -31,12 +31,12 @@ public class VentanaInicio extends javax.swing.JFrame {
         
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
         Nodo nodos = new Nodo("", "hola");
-        DefaultMutableTreeNode ramas = new DefaultMutableTreeNode("hi");
-        DefaultMutableTreeNode ramas1 = new DefaultMutableTreeNode("dfadfadf");
-        DefaultMutableTreeNode ramas2 = new DefaultMutableTreeNode("adfadf");
+        DefaultMutableTreeNode ramas = new DefaultMutableTreeNode("ramas");
+        DefaultMutableTreeNode ramas1 = new DefaultMutableTreeNode("ramas1");
+        DefaultMutableTreeNode ramas2 = new DefaultMutableTreeNode("ramas3");
         
-        ramas1.add(new DefaultMutableTreeNode("Holllaaf"));
-        ramas.setUserObject(nodos);
+        ramas1.add(new DefaultMutableTreeNode("archi1"));
+        //ramas.setUserObject(nodos);
         ArrayList<DefaultMutableTreeNode> listaNodos = new ArrayList<>();
         
         listaNodos.add(ramas);
@@ -83,7 +83,7 @@ public class VentanaInicio extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 
-                System.out.println("Path: "+treeArbol.getLeadSelectionPath().getPath());
+                System.out.println("Path: "+treeArbol.getLeadSelectionPath());
                 System.out.println("Path: "+treeArbol.getParent());
                 //Nodo no = (Nodo) treeArbol.getLastSelectedPathComponent();
             }
@@ -204,8 +204,9 @@ public class VentanaInicio extends javax.swing.JFrame {
         
         try {
             sintactico.parse();
-            
-            
+            DefaultMutableTreeNode roots = sintactico.getArbol();
+            DefaultTreeModel arbol = new  DefaultTreeModel(roots);
+            treeArbol.setModel(arbol);
             
 //            textAreaDatos.setText(sintactico.s);
         } catch (Exception e) {

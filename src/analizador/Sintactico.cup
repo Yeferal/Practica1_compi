@@ -12,6 +12,15 @@ import javax.swing.tree.MutableTreeNode;
 //Codigo para el parser, variables, metodos
 parser code
 {:
+
+    DefaultMutableTreeNode root;
+    public DefaultMutableTreeNode getArbol(){
+        return this.root;
+    }
+
+    public void setArbol(DefaultMutableTreeNode root){    
+    this.root = root;
+    }
     /*
     public VentanaInicio ventana;
     public void setVentana(VentanaInicio ventana){
@@ -84,7 +93,7 @@ TIPO_ENTRADA::= ARCHIVO TIPO_ARCHIVO
 TIPO_PROYECTO::= NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra proyecto: "+a);:} COMILLAS MAYOR 
 {:
     Nodo raiz = new Nodo("",(String) a);
-    root = new DefaultMutableTreeNode();
+    root = new DefaultMutableTreeNode(raiz);
     listaNodos = new ArrayList<>();
     listaNodos.add(root);
     System.out.println("Tamanio "+listaNodos.size());
@@ -93,24 +102,26 @@ SEGUIDO;
 
 TIPO_ARCHIVO::= NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra archivo: "+a); :} COMILLAS UBICACION IGUAL COMILLAS RUTA:b CSV:v {:System.out.println("ruta DE ARCHIVO: "+b+v); :} COMILLAS DIAGONAL MAYOR 
 {:
-System.out.println("Tamanio "+listaNodos.size());
+    System.out.println("Tamanio "+listaNodos.size());
     Nodo nodo = new Nodo((String) b+v,(String) a);
     DefaultMutableTreeNode nodoArchivo = listaNodos.get(listaNodos.size()-1);
+    DefaultMutableTreeNode nodoArchivoTemp= new DefaultMutableTreeNode();
+    nodoArchivoTemp.setUserObject(nodo);
     listaNodos.remove(listaNodos.size()-1);
-    nodoArchivo.setUserObject( nodo);
+    nodoArchivo.add(nodoArchivoTemp);
     listaNodos.add(nodoArchivo);
-
+    //root.add(nodoArchivoTemp);
 :}
 SEGUIDO;
 
 TIPO_CARPETA::= NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra carpeta: "+a); :} COMILLAS MAYOR 
 {:
-System.out.println("Tamanio "+listaNodos.size());
+    System.out.println("Tamanio "+listaNodos.size());
     Nodo nodo = new Nodo("",(String) a);
     //DefaultMutableTreeNode nodoCarpeta = listaNodos.get(listaNodos.size()-1);
-    DefaultMutableTreeNode nodoCarpeta = new DefaultMutableTreeNode();
+    DefaultMutableTreeNode nodoCarpeta = new DefaultMutableTreeNode((String) a);
     //listaNodos.remove(listaNodos.size()-1);
-    nodoCarpeta.setUserObject( nodo);
+    nodoCarpeta.setUserObject(nodo);
     listaNodos.add(nodoCarpeta);
     
 :}
@@ -123,6 +134,7 @@ TIPO_CERRAR::= PROYECTO MAYOR
     listaNodos.remove(listaNodos.size()-1);
     root = arbolFinal;
     System.out.println("Tamanio final "+listaNodos.size());
+    parser.setArbol(root);
     RESULT = root; 
 
 :}
