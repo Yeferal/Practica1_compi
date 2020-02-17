@@ -7,8 +7,17 @@ import analizador.AnalizadorSintactico;
 import analizador.AnalizadorSintactico2;
 import analizador.AnalizadorLexico3;
 import analizador.AnalizadorSintactico3;
+import arbol.Nodo;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.StringReader;
+import java.util.ArrayList;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 
 public class VentanaInicio extends javax.swing.JFrame {
@@ -17,6 +26,40 @@ public class VentanaInicio extends javax.swing.JFrame {
     public VentanaInicio() {
         initComponents();
         this.setLocationRelativeTo(null);
+        agregarPopJtree();
+        treeArbol.getLastSelectedPathComponent();
+        
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+        Nodo nodos = new Nodo("", "hola");
+        DefaultMutableTreeNode ramas = new DefaultMutableTreeNode("hi");
+        DefaultMutableTreeNode ramas1 = new DefaultMutableTreeNode("dfadfadf");
+        DefaultMutableTreeNode ramas2 = new DefaultMutableTreeNode("adfadf");
+        
+        ramas1.add(new DefaultMutableTreeNode("Holllaaf"));
+        ramas.setUserObject(nodos);
+        ArrayList<DefaultMutableTreeNode> listaNodos = new ArrayList<>();
+        
+        listaNodos.add(ramas);
+        
+        
+        listaNodos.add(ramas1);
+        DefaultMutableTreeNode ramaT = listaNodos.get(listaNodos.size()-1);
+        ramaT.add(ramas2);
+        listaNodos.remove(listaNodos.size()-1);
+        //DefaultMutableTreeNode ramasE = listaNodos.get(listaNodos.size()-1);
+        listaNodos.add(ramaT);
+        //root.add(ramas1);
+        
+        //root.add(ramas);
+        //root.add(ramas1);
+        //root.add(ramas2);
+        //root.add(root);
+        root.add(listaNodos.get(0));
+        root.add(listaNodos.get(1));
+        
+        DefaultTreeModel arbol = new  DefaultTreeModel(root);
+        treeArbol.setModel(arbol);
+        
     }
     
     public void arbol(){
@@ -25,6 +68,28 @@ public class VentanaInicio extends javax.swing.JFrame {
         
     }
     
+    private void agregarPopJtree(){
+        JPopupMenu menu = new JPopupMenu();
+        JMenuItem menuItem1 = new JMenuItem("Nueva Carpeta");
+        JMenuItem menuItem2 = new JMenuItem("Nuevo archivo");
+        JMenuItem menuItem3 = new JMenuItem("Editar");
+        menu.add(menuItem1);
+        menu.add(menuItem2);
+        menu.add(menuItem3);
+        treeArbol.setComponentPopupMenu(menu);
+        
+        menuItem1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                
+                System.out.println("Path: "+treeArbol.getLeadSelectionPath().getPath());
+                System.out.println("Path: "+treeArbol.getParent());
+                //Nodo no = (Nodo) treeArbol.getLastSelectedPathComponent();
+            }
+        });
+        
+    }
     
     
     
@@ -39,6 +104,7 @@ public class VentanaInicio extends javax.swing.JFrame {
         textAreaDatos = new javax.swing.JTextArea();
         panelArchivo = new javax.swing.JPanel();
         scrollArchivo = new javax.swing.JScrollPane();
+        treeArbol = new javax.swing.JTree();
         panelConsulta = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         textAreaConsulta = new javax.swing.JTextArea();
@@ -70,12 +136,15 @@ public class VentanaInicio extends javax.swing.JFrame {
 
         getContentPane().add(panelDatos, new org.netbeans.lib.awtextra.AbsoluteConstraints(295, 0, 990, 450));
 
+        scrollArchivo.setViewportView(treeArbol);
+
         javax.swing.GroupLayout panelArchivoLayout = new javax.swing.GroupLayout(panelArchivo);
         panelArchivo.setLayout(panelArchivoLayout);
         panelArchivoLayout.setHorizontalGroup(
             panelArchivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelArchivoLayout.createSequentialGroup()
-                .addComponent(scrollArchivo, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelArchivoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(scrollArchivo, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
                 .addContainerGap())
         );
         panelArchivoLayout.setVerticalGroup(
@@ -135,6 +204,9 @@ public class VentanaInicio extends javax.swing.JFrame {
         
         try {
             sintactico.parse();
+            
+            
+            
 //            textAreaDatos.setText(sintactico.s);
         } catch (Exception e) {
             e.printStackTrace();
@@ -155,5 +227,6 @@ public class VentanaInicio extends javax.swing.JFrame {
     private javax.swing.JScrollPane scrollArchivo;
     private javax.swing.JTextArea textAreaConsulta;
     public javax.swing.JTextArea textAreaDatos;
+    private javax.swing.JTree treeArbol;
     // End of variables declaration//GEN-END:variables
 }
