@@ -38,7 +38,7 @@ public class VentanaInicio extends javax.swing.JFrame {
         ramas1.add(new DefaultMutableTreeNode("archi1"));
         //ramas.setUserObject(nodos);
         ArrayList<DefaultMutableTreeNode> listaNodos = new ArrayList<>();
-        
+        System.out.println("file name: "+ramas.getUserObject());;
         listaNodos.add(ramas);
         
         
@@ -197,16 +197,16 @@ public class VentanaInicio extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String texto = textAreaConsulta.getText();
         
-        AnalizadorLexico lexico = new AnalizadorLexico(new StringReader(texto));
+        AnalizadorLexico2 lexico = new AnalizadorLexico2(new StringReader(texto));
         
-        AnalizadorSintactico sintactico = new AnalizadorSintactico(lexico);
+        AnalizadorSintactico2 sintactico = new AnalizadorSintactico2(lexico);
         //sintactico.setVentana(this);
         
         try {
             sintactico.parse();
-            DefaultMutableTreeNode roots = sintactico.getArbol();
-            DefaultTreeModel arbol = new  DefaultTreeModel(roots);
-            treeArbol.setModel(arbol);
+            //DefaultMutableTreeNode roots = sintactico.getArbol();
+            //DefaultTreeModel arbol = new  DefaultTreeModel(roots);
+            //treeArbol.setModel(arbol);
             
 //            textAreaDatos.setText(sintactico.s);
         } catch (Exception e) {
