@@ -7,7 +7,9 @@ import analizador.AnalizadorSintactico;
 import analizador.AnalizadorSintactico2;
 import analizador.AnalizadorLexico3;
 import analizador.AnalizadorSintactico3;
+import arbol.Arbol;
 import arbol.Nodo;
+import archivos.Archivo;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -22,7 +24,9 @@ import javax.swing.tree.DefaultTreeModel;
 
 public class VentanaInicio extends javax.swing.JFrame {
 
-
+    String pathIde = "";
+    Archivo archivo = new Archivo();
+    
     public VentanaInicio() {
         initComponents();
         this.setLocationRelativeTo(null);
@@ -30,7 +34,7 @@ public class VentanaInicio extends javax.swing.JFrame {
         treeArbol.getLastSelectedPathComponent();
         
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
-        Nodo nodos = new Nodo("", "hola");
+        Nodo nodos = new Nodo("", "hola","CARPETA");
         DefaultMutableTreeNode ramas = new DefaultMutableTreeNode("ramas");
         DefaultMutableTreeNode ramas1 = new DefaultMutableTreeNode("ramas1");
         DefaultMutableTreeNode ramas2 = new DefaultMutableTreeNode("ramas3");
@@ -58,21 +62,26 @@ public class VentanaInicio extends javax.swing.JFrame {
         root.add(listaNodos.get(1));
         
         DefaultTreeModel arbol = new  DefaultTreeModel(root);
-        treeArbol.setModel(arbol);
+        pathIde = "E:\\LENOVO-PC\\Documents\\NetBeansProjects\\Inicio\\src\\Prueba.csv";
+        //treeArbol.setModel(arbol);
+        //Archivo ar = new Archivo();
+        //ar.crearIde("Prueba", "E:\\LENOVO-PC\\Documents\\NetBeansProjects\\Inicio\\src");
         
     }
     
-    public void arbol(){
-        
-        
-        
+    public String getTextoCsv(String texto){
+        if(texto.length()>=4 && texto.substring(texto.length()-4,texto.length() ).equals(".csv")){
+            return texto;
+        }else{
+            return texto+".csv";
+        }
     }
     
     private void agregarPopJtree(){
         JPopupMenu menu = new JPopupMenu();
         JMenuItem menuItem1 = new JMenuItem("Nueva Carpeta");
         JMenuItem menuItem2 = new JMenuItem("Nuevo archivo");
-        JMenuItem menuItem3 = new JMenuItem("Editar");
+        JMenuItem menuItem3 = new JMenuItem("Eliminar");
         menu.add(menuItem1);
         menu.add(menuItem2);
         menu.add(menuItem3);
@@ -83,14 +92,81 @@ public class VentanaInicio extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 
-                System.out.println("Path: "+treeArbol.getLeadSelectionPath());
-                System.out.println("Path: "+treeArbol.getParent());
-                //Nodo no = (Nodo) treeArbol.getLastSelectedPathComponent();
+                System.out.println("Path: "+treeArbol.getLastSelectedPathComponent());
+                System.out.println("Path: "+treeArbol.getModel());
+                
+                DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) treeArbol.getLastSelectedPathComponent();
+                if (nodoSelecionado != null) {
+                    DefaultTreeModel modeloActual = (DefaultTreeModel) treeArbol.getModel();
+                    
+                    String nombreCarpeta = JOptionPane.showInputDialog("Escriba el nombre de la Carpeta");
+                    Nodo nodoTemp = new Nodo("", nombreCarpeta,"CARPETA");
+                    
+                    modeloActual.insertNodeInto(new DefaultMutableTreeNode(nodoTemp), nodoSelecionado, modeloActual.getChildCount(nodoSelecionado));
+                    modeloActual.reload();
+                    treeArbol.setModel(modeloActual);
+                    Arbol ar = new Arbol();
+                    ar.insertarTextoModelo(treeArbol, "");
+                    textAreaDatos.setText(ar.getTextoArchivoIde());
+                    modificarIde(ar.getTextoArchivoIde());
+                }else{
+                    JOptionPane.showMessageDialog(null, "No selecciono el archivo o carpeta");
+                }
+                
+            }
+        });
+        
+        menuItem2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) treeArbol.getLastSelectedPathComponent();
+                if (nodoSelecionado != null) {
+                    DefaultTreeModel modeloActual = (DefaultTreeModel) treeArbol.getModel();
+                    
+                    String nombreCarpeta = JOptionPane.showInputDialog("Escriba el nombre del Archivo");
+                    String pathArchivo = JOptionPane.showInputDialog("Escriba el la direccion del archivo csv");
+                    Nodo nodoTemp = new Nodo(getTextoCsv(pathArchivo), nombreCarpeta,"ARCHIVO");
+                    
+                    modeloActual.insertNodeInto(new DefaultMutableTreeNode(nodoTemp), nodoSelecionado, modeloActual.getChildCount(nodoSelecionado));
+                    modeloActual.reload();
+                    treeArbol.setModel(modeloActual);
+                    Arbol ar = new Arbol();
+                    ar.insertarTextoModelo(treeArbol, "");
+                    textAreaDatos.setText(ar.getTextoArchivoIde());
+                    modificarIde(ar.getTextoArchivoIde());
+                    
+                }else{
+                    JOptionPane.showMessageDialog(null, "No selecciono el archivo o carpeta");
+                }
+            }
+        });
+        
+        menuItem3.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) treeArbol.getLastSelectedPathComponent();
+                if (nodoSelecionado != null) {
+                    DefaultTreeModel modeloActual = (DefaultTreeModel) treeArbol.getModel();
+                    
+                    modeloActual.removeNodeFromParent(nodoSelecionado);
+                    modeloActual.reload();
+                    treeArbol.setModel(modeloActual);
+                    Arbol ar = new Arbol();
+                    ar.insertarTextoModelo(treeArbol, "");
+                    textAreaDatos.setText(ar.getTextoArchivoIde());
+                    modificarIde(ar.getTextoArchivoIde());
+                }else{
+                    JOptionPane.showMessageDialog(null, "No selecciono el archivo o carpeta");
+                }
             }
         });
         
     }
     
+    private void modificarIde(String texto){
+        
+        archivo.escribirArchivo(pathIde, texto);       
+    }
     
     
 
@@ -111,6 +187,7 @@ public class VentanaInicio extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        menuAbrirArchivo = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -183,7 +260,16 @@ public class VentanaInicio extends javax.swing.JFrame {
         });
         getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1300, 620, -1, -1));
 
-        jMenu1.setText("File");
+        jMenu1.setText("Archivo");
+
+        menuAbrirArchivo.setText("Abrir Archivo");
+        menuAbrirArchivo.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                menuAbrirArchivoMouseClicked(evt);
+            }
+        });
+        jMenu1.add(menuAbrirArchivo);
+
         jMenuBar1.add(jMenu1);
 
         jMenu2.setText("Edit");
@@ -197,22 +283,47 @@ public class VentanaInicio extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String texto = textAreaConsulta.getText();
         
-        AnalizadorLexico2 lexico = new AnalizadorLexico2(new StringReader(texto));
+        AnalizadorLexico lexico = new AnalizadorLexico(new StringReader(texto));
         
-        AnalizadorSintactico2 sintactico = new AnalizadorSintactico2(lexico);
+        AnalizadorSintactico sintactico = new AnalizadorSintactico(lexico);
         //sintactico.setVentana(this);
         
         try {
             sintactico.parse();
-            //DefaultMutableTreeNode roots = sintactico.getArbol();
-            //DefaultTreeModel arbol = new  DefaultTreeModel(roots);
-            //treeArbol.setModel(arbol);
+            
+            DefaultMutableTreeNode roots = sintactico.getArbol();
+            DefaultTreeModel arbol = new  DefaultTreeModel(roots);
+            treeArbol.setModel(arbol);
+            
             
 //            textAreaDatos.setText(sintactico.s);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void menuAbrirArchivoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuAbrirArchivoMouseClicked
+        
+        AnalizadorLexico lexico = new AnalizadorLexico(new StringReader(archivo.leerArchivo("E:\\LENOVO-PC\\Documents\\NetBeansProjects\\Inicio\\src\\Prueba.csv")));
+        
+        AnalizadorSintactico sintactico = new AnalizadorSintactico(lexico);
+        //sintactico.setVentana(this);
+        
+        try {
+            sintactico.parse();
+            
+            DefaultMutableTreeNode roots = sintactico.getArbol();
+            DefaultTreeModel arbol = new  DefaultTreeModel(roots);
+            treeArbol.setModel(arbol);
+            
+            
+//            textAreaDatos.setText(sintactico.s);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        
+    }//GEN-LAST:event_menuAbrirArchivoMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -222,6 +333,7 @@ public class VentanaInicio extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JMenu menuAbrirArchivo;
     private javax.swing.JPanel panelArchivo;
     private javax.swing.JPanel panelConsulta;
     private javax.swing.JPanel panelDatos;

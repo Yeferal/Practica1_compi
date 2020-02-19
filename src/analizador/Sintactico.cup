@@ -92,7 +92,7 @@ TIPO_ENTRADA::= ARCHIVO TIPO_ARCHIVO
 
 TIPO_PROYECTO::= NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra proyecto: "+a);:} COMILLAS MAYOR 
 {:
-    Nodo raiz = new Nodo("",(String) a);
+    Nodo raiz = new Nodo("",(String) a,"PROYECTO");
     root = new DefaultMutableTreeNode(raiz);
     listaNodos = new ArrayList<>();
     listaNodos.add(root);
@@ -103,7 +103,7 @@ SEGUIDO;
 TIPO_ARCHIVO::= NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra archivo: "+a); :} COMILLAS UBICACION IGUAL COMILLAS RUTA:b CSV:v {:System.out.println("ruta DE ARCHIVO: "+b+v); :} COMILLAS DIAGONAL MAYOR 
 {:
     System.out.println("Tamanio "+listaNodos.size());
-    Nodo nodo = new Nodo((String) b+v,(String) a);
+    Nodo nodo = new Nodo((String) b+v,(String) a,"ARCHIVO");
     DefaultMutableTreeNode nodoArchivo = listaNodos.get(listaNodos.size()-1);
     DefaultMutableTreeNode nodoArchivoTemp= new DefaultMutableTreeNode();
     nodoArchivoTemp.setUserObject(nodo);
@@ -117,7 +117,7 @@ SEGUIDO;
 TIPO_CARPETA::= NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra carpeta: "+a); :} COMILLAS MAYOR 
 {:
     System.out.println("Tamanio "+listaNodos.size());
-    Nodo nodo = new Nodo("",(String) a);
+    Nodo nodo = new Nodo("",(String) a,"CARPETA");
     //DefaultMutableTreeNode nodoCarpeta = listaNodos.get(listaNodos.size()-1);
     DefaultMutableTreeNode nodoCarpeta = new DefaultMutableTreeNode((String) a);
     //listaNodos.remove(listaNodos.size()-1);

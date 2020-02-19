@@ -6,8 +6,18 @@
       <SubComponents>
         <Menu class="javax.swing.JMenu" name="jMenu1">
           <Properties>
-            <Property name="text" type="java.lang.String" value="File"/>
+            <Property name="text" type="java.lang.String" value="Archivo"/>
           </Properties>
+          <SubComponents>
+            <Menu class="javax.swing.JMenu" name="menuAbrirArchivo">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Abrir Archivo"/>
+              </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="menuAbrirArchivoMouseClicked"/>
+              </Events>
+            </Menu>
+          </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="jMenu2">
           <Properties>

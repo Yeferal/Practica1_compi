@@ -1,0 +1,10 @@
+<PROYECTO nombre="Prueba">
+</PROYECTO><PROYECTO nombre="Prueba">
+	<CARPETA nombre="6564">
+	</CARPETA>
+</PROYECTO>
+<PROYECTO nombre="Prueba">
+	<CARPETA nombre="6564">
+		<ARCHIVO nombre="5" ubicacion="45.csv"/>
+	</CARPETA>
+</PROYECTO>

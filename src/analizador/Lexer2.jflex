@@ -17,7 +17,6 @@ import java.util.LinkedList;
 %char
 %column
 %full
-%ignorecase
 %line
 %unicode
 
@@ -31,7 +30,7 @@ Espacio         = [ \t\r\n]+
 Texto           = ({Palabra}|{Numero})+
 %%
 
-SELECCIONAR      {System.out.println("SELECCIONAR"); return new Symbol(Simbolos2.SELECCIONAR, yycolumn, yyline, yytext());}
+SELECCIONAR     {System.out.println("SELECCIONAR"); return new Symbol(Simbolos2.SELECCIONAR, yycolumn, yyline, yytext());}
 FILTRAR         {System.out.println("FILTRAR"); return new Symbol(Simbolos2.FILTRAR, yycolumn, yyline, yytext());}
 INSERTAR        {System.out.println("INSERTAR"); return new Symbol(Simbolos2.INSERTAR, yycolumn, yyline, yytext());}
 ACTUALIZAR      {System.out.println("ACTUALIZAR"); return new Symbol(Simbolos2.ACTUALIZAR, yycolumn, yyline, yytext());}
