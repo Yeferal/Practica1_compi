@@ -15,7 +15,7 @@ public class Archivo {
     
     
     public void crearIde(String nombre,String ruta){
-        File file = new File(ruta+"\\"+nombre+".csv");
+        File file = new File(ruta+"\\"+nombre+".ide");
         
         try {
             if(!file.exists()){
@@ -65,7 +65,25 @@ public class Archivo {
         return texto;
     }
     
+    private void borrarContenido(String ruta){
+        BufferedWriter bw = null;
+        try {
+            bw = new BufferedWriter(new FileWriter(ruta));
+            bw.write("");
+            bw.close();
+        } catch (IOException ex) {
+         
+        } finally {
+            try {
+                bw.close();
+            } catch (IOException ex) {
+                
+            }
+        }
+    }
+    
     public void escribirArchivo(String ruta,String texto){
+        borrarContenido(ruta);
         try {
             PrintWriter salida = new PrintWriter(
             new BufferedWriter(new FileWriter(ruta, true)));
@@ -74,5 +92,37 @@ public class Archivo {
         } catch (IOException e) {
 
         }
+    }
+    
+    public String leerCSV(String ruta){
+        String texto = "";
+        File archivo = null;
+        FileReader fr = null;
+        BufferedReader br = null;
+
+      try {
+         // Apertura del fichero y creacion de BufferedReader para poder
+         // hacer una lectura comoda (disponer del metodo readLine()).
+         archivo = new File (ruta);
+         fr = new FileReader (archivo);
+         br = new BufferedReader(fr);
+
+         // Lectura del fichero
+         String linea;
+         while((linea=br.readLine())!=null)
+            texto+=linea+"\n";
+      }
+      catch(Exception e){
+         e.printStackTrace();
+      }finally{
+         try{                    
+            if( null != fr ){   
+               fr.close();     
+            }                  
+         }catch (Exception e2){ 
+            e2.printStackTrace();
+         }
+      } 
+        return texto;
     }
 }

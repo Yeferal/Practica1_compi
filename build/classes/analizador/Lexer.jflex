@@ -24,7 +24,7 @@ import java.util.LinkedList;
     //expreciones regulares
 
 
-Caracteres      = [-_@+*#.]
+Caracteres      = [-_@+*#]
 Letra           = [a-zA-Z]
 Palabra         = {Letra} {Letra}*
 //Ruta            = ([Palabra | \\])+
@@ -62,7 +62,7 @@ ubicacion  {System.out.println("ubicacion"); return new Symbol(Simbolos.UBICACIO
     "\""         {System.out.println("comillas"); return new Symbol(Simbolos.COMILLAS , yycolumn, yyline, yytext());}
     "/"          {System.out.println("diagonal"); return new Symbol(Simbolos.DIAGONAL , yycolumn, yyline, yytext());}
     "="          {System.out.println("igual"); return new Symbol(Simbolos.IGUAL , yycolumn, yyline, yytext());}
-    ("\\"({Palabra}|{Caracteres}|{Numero}))+         {System.out.println("ruta"); return new Symbol(Simbolos.RUTA , yycolumn, yyline, yytext());}
+    ({Letra}":"|"*""\\"|"\\")(("\\"|{Palabra}|{Caracteres}|{Numero}))+         {System.out.println("ruta"); return new Symbol(Simbolos.RUTA , yycolumn, yyline, yytext());}
     {Numero}     {System.out.println("numero"); return new Symbol(Simbolos.NUMERO , yycolumn, yyline, yytext());}
     {Caracteres} {System.out.println("caracter"); return new Symbol(Simbolos.CARACTERES , yycolumn, yyline, yytext());}
     {Palabra}    {System.out.println("palabra"); return new Symbol(Simbolos.PALABRA , yycolumn, yyline, yytext());}

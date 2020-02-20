@@ -1,11 +1,23 @@
 //codigo usuario
 package analizador;
+import archivos.Tabla;
+import archivos.Tupla;
 import java_cup.runtime.Symbol;
 import java.util.LinkedList;
 
 //Codigo para el parser, variables, metodos
 parser code
 {:
+    
+    private Tabla tabla;
+
+
+    public Tabla getTabla(){
+        return tabla;
+    }
+    public void setTabla(Tabla tabla){
+        this.tabla = tabla;
+    }
     /*public static LinkedList<Error> tablaErrorLexico = new LinkedList<Error>();
     
     public void syntaxError(Symbol s){
@@ -35,6 +47,10 @@ parser code
 
 action code
 {:
+    
+    Tabla tabla = new Tabla();
+    Tupla tupla;
+
 :}
 
 //Declaraciones 
@@ -51,10 +67,24 @@ start with INICIO;
 
 //Reglas Semanticas
 
-INICIO::= TEXTO E
-          |TEXTO;
+INICIO::= TEXTO:a {:
+tupla = new Tupla();
+tupla.agregarContenido((String)a);:} E
+          |TEXTO:a {:
+tupla = new Tupla();
+tupla.agregarContenido((String)a);:};
           
-E ::= COMA TEXTO 
-      |COMA TEXTO E
-      |LINEA INICIO
-      |LINEA;
+E ::= COMA TEXTO:a {:tupla.agregarContenido((String)a);:} 
+      |COMA TEXTO:a {:tupla.agregarContenido((String)a);:} E
+      |LINEA {:
+      tabla.agregarTupla(tupla);
+      parser.setTabla(tabla);
+      //tupla.limpiarTupla();
+:} 
+INICIO
+      |LINEA {:
+      tabla.agregarTupla(tupla);
+      
+      parser.setTabla(tabla);
+      //tupla.limpiarTupla();
+:};

@@ -9,14 +9,30 @@
             <Property name="text" type="java.lang.String" value="Archivo"/>
           </Properties>
           <SubComponents>
-            <Menu class="javax.swing.JMenu" name="menuAbrirArchivo">
+            <MenuItem class="javax.swing.JMenuItem" name="menuAbrirProyecto">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Abrir Archivo"/>
+                <Property name="text" type="java.lang.String" value="Abrir Proyecto"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="menuAbrirArchivoMouseClicked"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuAbrirProyectoActionPerformed"/>
               </Events>
-            </Menu>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="menuCreaProyecto">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Crear Proyecto"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuCreaProyectoActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="menuCerrarProyecto">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Cerrar Proyecto"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuCerrarProyectoActionPerformed"/>
+              </Events>
+            </MenuItem>
           </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="jMenu2">

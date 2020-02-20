@@ -23,25 +23,15 @@ import java.util.LinkedList;
 
     //expreciones regulares
 Linea           = [\n]
-Coma            = [,]
-Caracteres      = [-_@+*#.]
+Caracteres      = [\"_@+*#.~`!$%"^"&()={}"[" "]"\|;:"'"<>/?"-"]
 Letra           = [a-zA-Z]
 Palabra         = {Letra} {Letra}*
 Digito          = [0-9]
 Numero          = {Digito} {Digito}*
-Espacio         = [ \t\r]+
+Espacio         = [ \t\r" "]+
 Texto           = ({Caracteres}|{Palabra}|{Numero}|{Espacio})+
 %%
 
-
-/*proyecto      = <PROYECTO nombre="identificador">
-proyectoend     = </PROYECTO>
-ruta            = [/identificador]+.csv
-archivo         = <ARCHIVO nombre="identificador" ubicacion="ruta"/>
-carpeta         = <CARPETA nombre="identificador">
-carpetaend      = </CARPETA>
-identificador   = [a-zA-Z]+
-*/
 
 
 <YYINITIAL> {
@@ -50,7 +40,7 @@ identificador   = [a-zA-Z]+
     ","          {System.out.println("Coma"); return new Symbol(Simbolos3.COMA , yycolumn, yyline, yytext());}
     {Texto}      {System.out.println("Texto"); return new Symbol(Simbolos3.TEXTO , yycolumn, yyline, yytext());}
     .            {System.out.println("error: "+"Columna: "+yycolumn+" linea: "+ yyline);
-                 Error datos = new Error(yytext(),"Error Lexico","Simbolo invalido",yyline,yycolumn);
-                 tablaErrorLexico.add(datos);}
+                 /*Error datos = new Error(yytext(),"Error Lexico","Simbolo invalido",yyline,yycolumn);
+                 tablaErrorLexico.add(datos)*/;}
     
 }

@@ -1,12 +1,32 @@
 //codigo usuario
 package analizador;
+import arbol.Busqueda;
+import arbol.Nodo;
+import archivos.Archivo;
+import archivos.Tabla;
+import java.io.StringReader;
 import java_cup.runtime.Symbol;
 import java.util.LinkedList;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 
 //Codigo para el parser, variables, metodos
 parser code
 {:
+    TreeNode nodoFin;
+    ArrayList<Tabla> listaTablas;
+
+    public void setLista(ArrayList<Tabla> listaTablas){
+        System.out.println("Tmanio lisata: "+lsitaTablas.size());
+        this.listaTablas = listaTablas;
+    }
+    public ArrayList<Tabla> getLista(){
+        return listaTablas;
+    }
+
     /*public static LinkedList<Error> tablaErrorLexico = new LinkedList<Error>();
     
     public void syntaxError(Symbol s){
@@ -20,6 +40,13 @@ parser code
     System.out.println("Columna: "+columna);
 
     } */
+    
+    public void setArbol(TreeNode nodoFIN){
+        this.nodoFin=nodoFIN;   
+    }
+    public TreeNode getArbol(){
+        return nodoFin;
+    }
 
     private Symbol s;
     public void syntaError(Symbol s){
@@ -37,6 +64,53 @@ parser code
 action code
 {:
     ArrayList<DefaultMutableTreeNode> listaNodos;
+    TreeNode nodoBuscado;
+    Busqueda busqueda = new Busqueda();
+    Archivo archivo = new Archivo();
+    ArrayList<Tabla> listaTablas = new ArrayList<>();
+
+    public void verNombre(String path){
+        String te = path;
+        String signo = Pattern.quote(".");
+        String [] nombres = te.split(signo);
+        DefaultMutableTreeNode nodoP = (DefaultMutableTreeNode) parser.getArbol();
+        Nodo nodoOb =(Nodo) nodoP.getUserObject();
+        if(nodoOb.getNombre().equals(nombres[0])){
+            buscar(nombres);
+        }else{
+            System.out.println("No se parece");
+        }
+        
+
+    }
+    public void buscar(String [] paths){
+        TreeNode nod =(TreeNode) parser.getArbol();
+        for(int i =1;i<paths.length;i++){
+            busqueda.insertarNodo(nod,paths[i]);
+            nod = busqueda.getNodoPadre();
+        }
+        parser.setArbol(nod);
+        if(parser.getArbol()!=null){
+            System.out.println("Si encontro"+nod.toString());
+        }else{
+            System.out.println("No encontro");
+        }
+    }
+
+    private void analizarCsv(){
+        DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) parser.getArbol();
+        Nodo nodoS =(Nodo) nodoSelecionado.getUserObject();
+        AnalizadorLexico3 lexico = new AnalizadorLexico3(new StringReader(archivo.leerCSV(nodoS.getPath())));
+        AnalizadorSintactico3 sintactico = new AnalizadorSintactico3(lexico);
+        try {
+            sintactico.parse();
+            listaTablas.add(sintactico.getTabla());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        
+    
+    }
 :}
 
 //Declaraciones 
@@ -61,10 +135,26 @@ INICIO::= SELECCIONAR TIPO_SELECCIONAR
          |ACTUALIZAR EN TIPO_ACTUALIZAR
          |ELIMINAR EN TIPO_ELIMINAR;
 
-TIPO_SELECCIONAR::= ASTERISCO EN PATH_ARCHIVO FILTRAR TIPO_FILTROS FINALIZA
-                    |LISTA_COLUMNAS_SELECT EN PATH_ARCHIVO FILTRAR TIPO_FILTROS FINALIZA
-                    |ASTERISCO EN PATH_ARCHIVO FINALIZA
-                    |LISTA_COLUMNAS_SELECT EN PATH_ARCHIVO FINALIZA;
+TIPO_SELECCIONAR::= ASTERISCO EN PATH_ARCHIVO:a {:
+    
+        verNombre((String)a);
+
+:} FILTRAR TIPO_FILTROS PUNTO_COMA FINALIZA
+                    |LISTA_COLUMNAS_SELECT EN PATH_ARCHIVO FILTRAR TIPO_FILTROS PUNTO_COMA FINALIZA
+                    |ASTERISCO EN PATH_ARCHIVO:a {:
+    
+                verNombre((String)a);
+                if(parser.getArbol()!=null){
+                    analizarCsv();
+                }else{
+                    System.out.println("No existe el archivo");
+                }
+
+:} 
+PUNTO_COMA{:
+                parser.setLista(listaTablas);
+:} FINALIZA
+                    |LISTA_COLUMNAS_SELECT EN PATH_ARCHIVO PUNTO_COMA FINALIZA;
 
 
 
@@ -81,7 +171,13 @@ FILTRO_AND::= TEXTO OPERADORES TEXTO AND FILTRO_AND
 FILTRO_OR::=  TEXTO OPERADORES TEXTO OR FILTRO_OR
              |TEXTO OPERADORES TEXTO;
 
-TIPO_INSERTAR::= PATH_ARCHIVO PARENTECIS_A LISTA_COLUMNAS_INSERTAR PARENTECIS_C VALORES PARENTECIS_A LISTA_VALORES_INSERTAR PARENTECIS_C FINALIZA;
+TIPO_INSERTAR::= PATH_ARCHIVO:a {:
+
+    verNombre((String)a);
+
+
+
+:} PARENTECIS_A LISTA_COLUMNAS_INSERTAR PARENTECIS_C VALORES PARENTECIS_A LISTA_VALORES_INSERTAR PARENTECIS_C PUNTO_COMA FINALIZA;
 
 LISTA_COLUMNAS_INSERTAR::= TEXTO
                           |TEXTO COMA LISTA_COLUMNAS_INSERTAR;
@@ -89,18 +185,20 @@ LISTA_COLUMNAS_INSERTAR::= TEXTO
 LISTA_VALORES_INSERTAR::=  TEXTO
                           |TEXTO COMA LISTA_VALORES_INSERTAR;
 
-TIPO_ACTUALIZAR::= PATH_ARCHIVO ASIGNAR ASIGNAR_COLUMNA FINALIZA
-                   |PATH_ARCHIVO ASIGNAR ASIGNAR_COLUMNA FILTRAR TIPO_FILTROS FINALIZA;
+TIPO_ACTUALIZAR::= PATH_ARCHIVO ASIGNAR ASIGNAR_COLUMNA PUNTO_COMA FINALIZA
+                   |PATH_ARCHIVO ASIGNAR ASIGNAR_COLUMNA FILTRAR TIPO_FILTROS PUNTO_COMA PUNTO_COMA FINALIZA;
 
 ASIGNAR_COLUMNA::=  TEXTO IGUAL COMILLAS TEXTO COMILLAS COMA ASIGNAR_COLUMNA
                     |TEXTO IGUAL COMILLAS TEXTO COMILLAS;
 
-TIPO_ELIMINAR::= PATH_ARCHIVO FINALIZA {:
-        
+TIPO_ELIMINAR::= PATH_ARCHIVO:a {:
 
+            verNombre((String)a);
+            
 
 :}
-                |PATH_ARCHIVO FILTRAR TIPO_FILTROS FINALIZA;
+PUNTO_COMA FINALIZA 
+                |PATH_ARCHIVO FILTRAR TIPO_FILTROS PUNTO_COMA FINALIZA;
 
 OPERADORES::= IGUAL
              |MENOR
@@ -110,5 +208,5 @@ OPERADORES::= IGUAL
              |DIFERENTE;
 
 
-FINALIZA::= PUNTO_COMA INICIO
-            |PUNTO_COMA;
+FINALIZA::= INICIO
+            |;
