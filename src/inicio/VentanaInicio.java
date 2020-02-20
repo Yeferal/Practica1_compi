@@ -74,7 +74,7 @@ public class VentanaInicio extends javax.swing.JFrame {
             for (int j = 0; j < lista.get(i).getTabla().size(); j++) {
                 System.out.println("t3: "+lista.get(i).getTabla().get(j).getRegistros().size());
                 for (int k = 0; k < lista.get(i).getTabla().get(j).getRegistros().size()-1; k++) {
-                    textAreaDatos.setText(textAreaDatos.getText()+lista.get(i).getTabla().get(j).getRegistros().get(k)+",");
+                    textAreaDatos.setText(textAreaDatos.getText()+lista.get(i).getTabla().get(j).getRegistros().get(k)+"\t");
                 }
                 textAreaDatos.setText(textAreaDatos.getText()+lista.get(i).getTabla().get(j).getRegistros().get(lista.get(i).getTabla().get(j).getRegistros().size()-1)+"\n");
             }

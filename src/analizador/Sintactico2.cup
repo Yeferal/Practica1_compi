@@ -20,7 +20,7 @@ parser code
     ArrayList<Tabla> listaTablas;
 
     public void setLista(ArrayList<Tabla> listaTablas){
-        System.out.println("Tmanio lisata: "+lsitaTablas.size());
+        System.out.println("Tmanio lisata: "+listaTablas.size());
         this.listaTablas = listaTablas;
     }
     public ArrayList<Tabla> getLista(){
@@ -68,6 +68,7 @@ action code
     Busqueda busqueda = new Busqueda();
     Archivo archivo = new Archivo();
     ArrayList<Tabla> listaTablas = new ArrayList<>();
+    Eliminar eliminar = new Eliminar();
 
     public void verNombre(String path){
         String te = path;
@@ -81,7 +82,6 @@ action code
             System.out.println("No se parece");
         }
         
-
     }
     public void buscar(String [] paths){
         TreeNode nod =(TreeNode) parser.getArbol();
@@ -105,6 +105,7 @@ action code
         try {
             sintactico.parse();
             listaTablas.add(sintactico.getTabla());
+            System.out.println("Tamanio final: "+parser.getTabla().size());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -197,7 +198,18 @@ TIPO_ELIMINAR::= PATH_ARCHIVO:a {:
             
 
 :}
-PUNTO_COMA FINALIZA 
+PUNTO_COMA {:
+            if(parser.getArbol()!=null){
+                    DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) parser.getArbol();
+                    Nodo nodoS =(Nodo) nodoSelecionado.getUserObject();
+                    eliminar.leerCSV(nodoS.getPath());
+                }else{
+                    System.out.println("No existe el archivo");
+                }
+            
+
+
+:} FINALIZA 
                 |PATH_ARCHIVO FILTRAR TIPO_FILTROS PUNTO_COMA FINALIZA;
 
 OPERADORES::= IGUAL
