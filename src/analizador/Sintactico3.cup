@@ -1,3 +1,4 @@
+
 //codigo usuario
 package analizador;
 import archivos.Tabla;
@@ -13,6 +14,7 @@ parser code
 
 
     public Tabla getTabla(){
+        System.out.println("Tam: "+tabla.getTabla().size());
         return tabla;
     }
     public void setTabla(Tabla tabla){
@@ -67,15 +69,32 @@ start with INICIO;
 
 //Reglas Semanticas
 
+/*INICIO ::= TEXTO E
+           |TEXTO;
+
+E ::= COMA TEXTO 
+      |COMA TEXTO E
+      |LINEA INICIO
+      |LINEA
+      |COMA E;*/
+
+
+
+
+
+
+
 INICIO::= TEXTO:a {:
 tupla = new Tupla();
+System.out.println("te: "+a);
 tupla.agregarContenido((String)a);:} E
           |TEXTO:a {:
 tupla = new Tupla();
+System.out.println("te: "+a);
 tupla.agregarContenido((String)a);:};
           
-E ::= COMA TEXTO:a {:tupla.agregarContenido((String)a);:} 
-      |COMA TEXTO:a {:tupla.agregarContenido((String)a);:} E
+E ::= COMA TEXTO:a {: System.out.println("te: "+a); tupla.agregarContenido((String)a); parser.setTabla(tabla);:} 
+      |COMA TEXTO:a {: System.out.println("te: "+a); tupla.agregarContenido((String)a);:} E
       |LINEA {:
       tabla.agregarTupla(tupla);
       parser.setTabla(tabla);
@@ -87,4 +106,5 @@ INICIO
       
       parser.setTabla(tabla);
       //tupla.limpiarTupla();
-:};
+:}
+      |COMA {:tupla.agregarContenido("");:} E;

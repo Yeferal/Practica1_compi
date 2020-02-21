@@ -3,6 +3,10 @@ package analizador;
 import arbol.Busqueda;
 import arbol.Nodo;
 import archivos.Archivo;
+import archivos.Eliminar;
+import archivos.Insercion;
+import archivos.Actualizar;
+import archivos.SeleccionColumna;
 import archivos.Tabla;
 import java.io.StringReader;
 import java_cup.runtime.Symbol;
@@ -64,11 +68,17 @@ parser code
 action code
 {:
     ArrayList<DefaultMutableTreeNode> listaNodos;
+    ArrayList<String> listaColumnasB = new ArrayList<>();
+    ArrayList<String> listaColumnasI = new ArrayList<>();
+    ArrayList<String> seleccionColumnas = new ArrayList<>();
     TreeNode nodoBuscado;
     Busqueda busqueda = new Busqueda();
     Archivo archivo = new Archivo();
     ArrayList<Tabla> listaTablas = new ArrayList<>();
     Eliminar eliminar = new Eliminar();
+    Insercion insercion = new Insercion();
+    Actualizar actualizar = new Actualizar();
+    SeleccionColumna seleccionColumna = new SeleccionColumna();
 
     public void verNombre(String path){
         String te = path;
@@ -105,7 +115,7 @@ action code
         try {
             sintactico.parse();
             listaTablas.add(sintactico.getTabla());
-            System.out.println("Tamanio final: "+parser.getTabla().size());
+            //System.out.println("Tamanio final: "+parser.getTabla().size());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -132,8 +142,8 @@ start with INICIO;
 //Reglas Semanticas
 
 INICIO::= SELECCIONAR TIPO_SELECCIONAR
-         |INSERTAR EN TIPO_INSERTAR
-         |ACTUALIZAR EN TIPO_ACTUALIZAR
+         |INSERTAR EN PATH_ARCHIVO:a {:verNombre((String)a);:} TIPO_INSERTAR
+         |ACTUALIZAR EN PATH_ARCHIVO:a {:verNombre((String)a);:} ASIGNAR ASIGNAR_COLUMNA TIPO_ACTUALIZAR
          |ELIMINAR EN TIPO_ELIMINAR;
 
 TIPO_SELECCIONAR::= ASTERISCO EN PATH_ARCHIVO:a {:
@@ -141,26 +151,41 @@ TIPO_SELECCIONAR::= ASTERISCO EN PATH_ARCHIVO:a {:
         verNombre((String)a);
 
 :} FILTRAR TIPO_FILTROS PUNTO_COMA FINALIZA
-                    |LISTA_COLUMNAS_SELECT EN PATH_ARCHIVO FILTRAR TIPO_FILTROS PUNTO_COMA FINALIZA
+                    
                     |ASTERISCO EN PATH_ARCHIVO:a {:
     
                 verNombre((String)a);
                 if(parser.getArbol()!=null){
                     analizarCsv();
+                    parser.setLista(listaTablas);
                 }else{
                     System.out.println("No existe el archivo");
                 }
 
 :} 
 PUNTO_COMA{:
-                parser.setLista(listaTablas);
+                
 :} FINALIZA
-                    |LISTA_COLUMNAS_SELECT EN PATH_ARCHIVO PUNTO_COMA FINALIZA;
+                    |LISTA_COLUMNAS_SELECT EN PATH_ARCHIVO:a {:verNombre((String)a);:} FILTRAR TIPO_FILTROS PUNTO_COMA FINALIZA
+                    |LISTA_COLUMNAS_SELECT EN PATH_ARCHIVO:a {:verNombre((String)a);:} PUNTO_COMA {:
+
+                    if(parser.getArbol()!=null){
+                        DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) parser.getArbol();
+                        Nodo nodoS =(Nodo) nodoSelecionado.getUserObject();
+                        seleccionColumna.listarTabla(nodoS.getPath(),seleccionColumnas);
+                        
+                        listaTablas.add(seleccionColumna.getTablaTemp());
+                        parser.setLista(listaTablas);
+                        seleccionColumnas.clear();
+                    }else{
+                        System.out.println("No existe el archivo");
+                    }
+
+:} FINALIZA;
 
 
-
-LISTA_COLUMNAS_SELECT::= TEXTO
-                        |TEXTO COMA LISTA_COLUMNAS_INSERTAR;
+LISTA_COLUMNAS_SELECT::= TEXTO:b COMA {: seleccionColumnas.add((String)b); System.out.println("Informacion2: "+seleccionColumnas.size()); :} LISTA_COLUMNAS_INSERTAR
+                        |TEXTO:c {: seleccionColumnas.add((String)c); System.out.println("Informacion1: "+seleccionColumnas.size()); :};
 
 TIPO_FILTROS::= TEXTO OPERADORES TEXTO AND FILTRO_AND
                 |TEXTO OPERADORES TEXTO OR FILTRO_OR
@@ -172,25 +197,63 @@ FILTRO_AND::= TEXTO OPERADORES TEXTO AND FILTRO_AND
 FILTRO_OR::=  TEXTO OPERADORES TEXTO OR FILTRO_OR
              |TEXTO OPERADORES TEXTO;
 
-TIPO_INSERTAR::= PATH_ARCHIVO:a {:
+TIPO_INSERTAR::= PARENTECIS_A LISTA_COLUMNAS_INSERTAR PARENTECIS_C VALORES PARENTECIS_A LISTA_VALORES_INSERTAR PARENTECIS_C PUNTO_COMA {:
+    
+                if(parser.getArbol()!=null){
+                    DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) parser.getArbol();
+                    Nodo nodoS =(Nodo) nodoSelecionado.getUserObject();
+                    insercion.insertarLine(nodoS.getPath(),listaColumnasB,listaColumnasI);
+                    analizarCsv();
+                    parser.setLista(listaTablas);
+                    listaColumnasB.clear();
+                    listaColumnasI.clear();
+                }else{
+                    System.out.println("No existe el archivo");
+                }
 
-    verNombre((String)a);
+:} FINALIZA
+                |VALORES PARENTECIS_A LISTA_VALORES_INSERTAR PARENTECIS_C PUNTO_COMA {:
 
+                if(parser.getArbol()!=null){
+                    DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) parser.getArbol();
+                    Nodo nodoS =(Nodo) nodoSelecionado.getUserObject();
+                    insercion.setListaColumnasT(listaColumnasI);
+                    insercion.setLinea(nodoS.getPath());
+                    analizarCsv();
+                    parser.setLista(listaTablas);
+                    listaColumnasB.clear();
+                    listaColumnasI.clear();
+                }else{
+                    System.out.println("No existe el archivo");
+                }
+:} FINALIZA;
 
+LISTA_COLUMNAS_INSERTAR::= TEXTO:a {:listaColumnasB.add((String)a);:}
+                          |TEXTO:a {:listaColumnasB.add((String)a);:} COMA LISTA_COLUMNAS_INSERTAR;
 
-:} PARENTECIS_A LISTA_COLUMNAS_INSERTAR PARENTECIS_C VALORES PARENTECIS_A LISTA_VALORES_INSERTAR PARENTECIS_C PUNTO_COMA FINALIZA;
+LISTA_VALORES_INSERTAR::=  TEXTO:a {:listaColumnasI.add((String)a);:}
+                          |TEXTO:a {:listaColumnasI.add((String)a);:} COMA LISTA_VALORES_INSERTAR;
 
-LISTA_COLUMNAS_INSERTAR::= TEXTO
-                          |TEXTO COMA LISTA_COLUMNAS_INSERTAR;
+TIPO_ACTUALIZAR::= PUNTO_COMA {:
+                if(parser.getArbol()!=null){
+                    DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) parser.getArbol();
+                    Nodo nodoS =(Nodo) nodoSelecionado.getUserObject();
+                    actualizar.insertarLine(nodoS.getPath(),listaColumnasB,listaColumnasI);
+                    analizarCsv();
+                    parser.setLista(listaTablas);
+                    listaColumnasB.clear();
+                    listaColumnasI.clear();
+                }else{
+                    System.out.println("No existe el archivo");
+                }
 
-LISTA_VALORES_INSERTAR::=  TEXTO
-                          |TEXTO COMA LISTA_VALORES_INSERTAR;
+:} FINALIZA
+                   |FILTRAR TIPO_FILTROS PUNTO_COMA PUNTO_COMA FINALIZA;
 
-TIPO_ACTUALIZAR::= PATH_ARCHIVO ASIGNAR ASIGNAR_COLUMNA PUNTO_COMA FINALIZA
-                   |PATH_ARCHIVO ASIGNAR ASIGNAR_COLUMNA FILTRAR TIPO_FILTROS PUNTO_COMA PUNTO_COMA FINALIZA;
-
-ASIGNAR_COLUMNA::=  TEXTO IGUAL COMILLAS TEXTO COMILLAS COMA ASIGNAR_COLUMNA
-                    |TEXTO IGUAL COMILLAS TEXTO COMILLAS;
+ASIGNAR_COLUMNA::=  TEXTO:a IGUAL COMILLAS TEXTO:b COMILLAS {:listaColumnasB.add((String)a); listaColumnasI.add((String)b);:} COMA ASIGNAR_COLUMNA
+                    |TEXTO:a IGUAL COMILLAS TEXTO:b COMILLAS {:listaColumnasB.add((String)a); listaColumnasI.add((String)b);:}
+                    |TEXTO:a IGUAL TEXTO:b COMA {:listaColumnasB.add((String)a); listaColumnasI.add((String)b);:} ASIGNAR_COLUMNA
+                    |TEXTO:a IGUAL TEXTO:b {:listaColumnasB.add((String)a); listaColumnasI.add((String)b);:};
 
 TIPO_ELIMINAR::= PATH_ARCHIVO:a {:
 
@@ -203,12 +266,11 @@ PUNTO_COMA {:
                     DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) parser.getArbol();
                     Nodo nodoS =(Nodo) nodoSelecionado.getUserObject();
                     eliminar.leerCSV(nodoS.getPath());
+                    analizarCsv();
+                    parser.setLista(listaTablas);
                 }else{
                     System.out.println("No existe el archivo");
                 }
-            
-
-
 :} FINALIZA 
                 |PATH_ARCHIVO FILTRAR TIPO_FILTROS PUNTO_COMA FINALIZA;
 

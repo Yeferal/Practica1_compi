@@ -3,17 +3,19 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/arbol/Nodo.java</file>
-            <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/analizador/Sintactico.cup</file>
-            <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/analizador/AnalizadorLexico2.java</file>
-            <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/analizador/Lexer2.jflex</file>
-            <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/archivos/Archivo.java</file>
             <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/analizador/AnalizadorLexico3.java</file>
+            <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/archivos/Eliminar.java</file>
+            <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/analizador/Sintactico3.cup</file>
+            <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/archivos/Insercion.java</file>
+            <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/analizador/AnalizadorSintactico3.java</file>
+            <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/arbol/Nodo.java</file>
+            <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/arbol/Busqueda.java</file>
+            <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/analizador/AnalizadorLexico2.java</file>
+            <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/archivos/Archivo.java</file>
+            <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/generadores/archivo.csv</file>
             <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/analizador/Sintactico2.cup</file>
             <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/inicio/VentanaInicio.java</file>
-            <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/analizador/AnalizadorSintactico.java</file>
-            <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/analizador/Lexer.jflex</file>
-            <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/arbol/Arbol.java</file>
+            <file>file:/E:/LENOVO-PC/Documents/NetBeansProjects/Inicio/src/analizador/AnalizadorSintactico2.java</file>
         </group>
     </open-files>
 </project-private>

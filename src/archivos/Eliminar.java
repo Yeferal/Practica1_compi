@@ -29,7 +29,7 @@ public class Eliminar {
          // Lectura del fichero
          String linea;
         if((linea=br.readLine())!=null){
-            texto=linea+"\n";
+            texto=linea;
             System.out.println("Linea: " + texto);
             escribirArchivo(ruta, texto);
         }else{
@@ -54,13 +54,16 @@ public class Eliminar {
     
     public void escribirArchivo(String ruta,String texto){
         borrarContenido(ruta);
+        System.out.println("Borra");
         try {
             PrintWriter salida = new PrintWriter(
             new BufferedWriter(new FileWriter(ruta, true)));
-            salida.println(texto);
+                
+            salida.print(texto);
             salida.close();
+            System.out.println("Escribe");
         } catch (IOException e) {
-
+                e.printStackTrace();
         }
     }
     private void borrarContenido(String ruta){

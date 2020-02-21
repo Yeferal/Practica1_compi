@@ -14,6 +14,7 @@ import archivos.Archivo;
 import archivos.Tabla;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.StringReader;
@@ -68,17 +69,21 @@ public class VentanaInicio extends javax.swing.JFrame {
     }
     
     private void insertarTablaTexto(ArrayList<Tabla> lista){
-        System.out.println("t1: "+lista.size());
+        System.out.println("ta1: "+lista.size());
         for (int i = 0; i < lista.size(); i++) {
-            System.out.println("t2: "+lista.get(i).getTabla().size());
+            System.out.println("ta2: "+lista.get(i).getTabla().size());
             for (int j = 0; j < lista.get(i).getTabla().size(); j++) {
-                System.out.println("t3: "+lista.get(i).getTabla().get(j).getRegistros().size());
+                System.out.println("ta3: "+lista.get(i).getTabla().get(j).getRegistros().size());
                 for (int k = 0; k < lista.get(i).getTabla().get(j).getRegistros().size()-1; k++) {
-                    textAreaDatos.setText(textAreaDatos.getText()+lista.get(i).getTabla().get(j).getRegistros().get(k)+"\t");
+                    textAreaDatos.setText(textAreaDatos.getText()+lista.get(i).getTabla().get(j).getRegistros().get(k)+"\t\t");
                 }
                 textAreaDatos.setText(textAreaDatos.getText()+lista.get(i).getTabla().get(j).getRegistros().get(lista.get(i).getTabla().get(j).getRegistros().size()-1)+"\n");
             }
+            //textAreaDatos.setText(textAreaDatos.getText()+"\n---------------------------------------------------------------------------------------------------------------------------------------");
+            //textAreaDatos.setText(textAreaDatos.getText()+"---------------------------------------------------------------------------------------------------------------------------------------");
+            //textAreaDatos.setText(textAreaDatos.getText()+"---------------------------------------------------------------------------------------------------------------------------------------");
         }
+        
     }
     
     private void crearArchivo(){
@@ -301,6 +306,11 @@ public class VentanaInicio extends javax.swing.JFrame {
 
         textAreaConsulta.setColumns(20);
         textAreaConsulta.setRows(5);
+        textAreaConsulta.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                textAreaConsultaKeyTyped(evt);
+            }
+        });
         jScrollPane1.setViewportView(textAreaConsulta);
 
         javax.swing.GroupLayout panelConsultaLayout = new javax.swing.GroupLayout(panelConsulta);
@@ -458,6 +468,13 @@ public class VentanaInicio extends javax.swing.JFrame {
         pathIde="";
         treeArbol.setModel(null);
     }//GEN-LAST:event_menuCerrarProyectoActionPerformed
+
+    private void textAreaConsultaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textAreaConsultaKeyTyped
+        char cajaCodigo = evt.getKeyChar();
+        if(cajaCodigo==KeyEvent.VK_ENTER){
+            jButton1.doClick();
+        }
+    }//GEN-LAST:event_textAreaConsultaKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

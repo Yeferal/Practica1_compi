@@ -12,9 +12,9 @@ public class Tupla {
      
     public void agregarContenido(String texto){
         registros.add(texto);
-        for (int i = 0; i < registros.size(); i++) {
+        /*for (int i = 0; i < registros.size(); i++) {
             System.out.println(registros.get(i));
-        }
+        }*/
     }
     public void limpiarTupla(){
         registros.clear();
