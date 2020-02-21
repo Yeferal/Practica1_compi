@@ -184,8 +184,8 @@ PUNTO_COMA{:
 :} FINALIZA;
 
 
-LISTA_COLUMNAS_SELECT::= TEXTO:b COMA {: seleccionColumnas.add((String)b); System.out.println("Informacion2: "+seleccionColumnas.size()); :} LISTA_COLUMNAS_INSERTAR
-                        |TEXTO:c {: seleccionColumnas.add((String)c); System.out.println("Informacion1: "+seleccionColumnas.size()); :};
+LISTA_COLUMNAS_SELECT::= TEXTO:b COMA {:seleccionColumnas.add((String)b); System.out.println("Informacion2: "+b);:} LISTA_COLUMNAS_SELECT
+                        |TEXTO:c {:seleccionColumnas.add((String)c); System.out.println("Informacion1: "+c);:} ;
 
 TIPO_FILTROS::= TEXTO OPERADORES TEXTO AND FILTRO_AND
                 |TEXTO OPERADORES TEXTO OR FILTRO_OR
