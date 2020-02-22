@@ -2,6 +2,8 @@
 //codigo usuario
 package analizador;
 import archivos.Tabla;
+import inicio.VentanaInicio;
+import java.util.ArrayList;
 import archivos.Tupla;
 import java_cup.runtime.Symbol;
 import java.util.LinkedList;
@@ -11,8 +13,17 @@ parser code
 {:
     
     private Tabla tabla;
-
-
+    ArrayList<Error> listaErrores = new ArrayList<>();
+    VentanaInicio ventana;
+    public void setVentana(VentanaInicio ventana){
+        this.ventana=ventana;
+    }
+    public void setListaErrores(ArrayList<Error> listaErrores){
+        this.listaErrores = listaErrores;
+    }
+    public ArrayList<Error> getListaErrores(){
+        return listaErrores;
+    }
     public Tabla getTabla(){
         System.out.println("Tam: "+tabla.getTabla().size());
         return tabla;
@@ -20,9 +31,7 @@ parser code
     public void setTabla(Tabla tabla){
         this.tabla = tabla;
     }
-    /*public static LinkedList<Error> tablaErrorLexico = new LinkedList<Error>();
-    
-    public void syntaxError(Symbol s){
+    /*public void syntaxError(Symbol s){
     String lexema = s.value.toString();
     int fila = s.right;
     int columna = s.left;
@@ -34,15 +43,29 @@ parser code
 
     } */
 
+    public void escribirErrores(Error lista){
+            ventana.areaError.setText(ventana.areaError.getText()+lista.toString()+"\n");
+        
+    }
+
     private Symbol s;
-    public void syntaError(Symbol s){
+    public void syntaxError(Symbol s){
         this.s = s;
     }
     public Symbol getS(Symbol s){
         return this.s = s;
     }
 
+    public void setAccion(String tipo,String mensaje,String accion){
+            System.out.println(tipo+"         "+mensaje);
+        }
 
+        public void syntax_error(Symbol s){
+            Error e = new Error((String) s.value, "Sintactico", "Error Sintaxis token: " + s.right + " " + s.left + " " + s.value, s.right, s.left);
+            listaErrores.add(e);
+            escribirErrores(e);
+            setAccion("ERROR","Error Sintaxis token: " + s.right + " " + s.left + " " + s.value, "");
+        }
 :}
 
 //Coidgo para las acciones gramaticales
@@ -52,14 +75,15 @@ action code
     
     Tabla tabla = new Tabla();
     Tupla tupla;
+    String texto;
 
 :}
 
 //Declaraciones 
-terminal TEXTO, COMA,LINEA;
+terminal  COMA,LINEA,ERROR,TEXTO;
 
 // declaracion no terminales
-non terminal INICIO,E;
+non terminal INICIO,E,F;
 
 //presedencia de menor a mayor
 //precedence left NOMBRE, PALABRA;
@@ -69,42 +93,22 @@ start with INICIO;
 
 //Reglas Semanticas
 
-/*INICIO ::= TEXTO E
-           |TEXTO;
+INICIO ::= {:tupla = new Tupla(); texto=""; :} F;
 
-E ::= COMA TEXTO 
-      |COMA TEXTO E
-      |LINEA INICIO
-      |LINEA
-      |COMA E;*/
+F::= TEXTO:a {: tupla.agregarContenido((String)a);:} E
+     |TEXTO:a {: tupla.agregarContenido((String)a);:}
+     |COMA {:tupla.agregarContenido("");:} F
+     |error:e F {:parser.syntax_error((Symbol)e);:} 
+     |error:e {:parser.syntax_error((Symbol)e);:};
 
-
-
-
-
-
-
-INICIO::= TEXTO:a {:
-tupla = new Tupla();
-System.out.println("te: "+a);
-tupla.agregarContenido((String)a);:} E
-          |TEXTO:a {:
-tupla = new Tupla();
-System.out.println("te: "+a);
-tupla.agregarContenido((String)a);:};
-          
-E ::= COMA TEXTO:a {: System.out.println("te: "+a); tupla.agregarContenido((String)a); parser.setTabla(tabla);:} 
-      |COMA TEXTO:a {: System.out.println("te: "+a); tupla.agregarContenido((String)a);:} E
+E ::= COMA TEXTO:a {: tupla.agregarContenido((String)a);:} 
+      |COMA TEXTO:a {: tupla.agregarContenido((String)a);:} E
       |LINEA {:
       tabla.agregarTupla(tupla);
       parser.setTabla(tabla);
-      //tupla.limpiarTupla();
-:} 
-INICIO
-      |LINEA {:
+:} INICIO
+      |LINEA  {:
       tabla.agregarTupla(tupla);
-      
       parser.setTabla(tabla);
-      //tupla.limpiarTupla();
 :}
       |COMA {:tupla.agregarContenido("");:} E;

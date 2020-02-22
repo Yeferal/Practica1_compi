@@ -12,6 +12,7 @@ import arbol.Busqueda;
 import arbol.Nodo;
 import archivos.Archivo;
 import archivos.Tabla;
+import analizador.Error;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -69,11 +70,11 @@ public class VentanaInicio extends javax.swing.JFrame {
     }
     
     private void insertarTablaTexto(ArrayList<Tabla> lista){
-        System.out.println("ta1: "+lista.size());
+        //System.out.println("ta1: "+lista.size());
         for (int i = 0; i < lista.size(); i++) {
-            System.out.println("ta2: "+lista.get(i).getTabla().size());
+            //System.out.println("ta2: "+lista.get(i).getTabla().size());
             for (int j = 0; j < lista.get(i).getTabla().size(); j++) {
-                System.out.println("ta3: "+lista.get(i).getTabla().get(j).getRegistros().size());
+                //System.out.println("ta3: "+lista.get(i).getTabla().get(j).getRegistros().size());
                 for (int k = 0; k < lista.get(i).getTabla().get(j).getRegistros().size()-1; k++) {
                     textAreaDatos.setText(textAreaDatos.getText()+lista.get(i).getTabla().get(j).getRegistros().get(k)+"\t\t");
                 }
@@ -215,10 +216,19 @@ public class VentanaInicio extends javax.swing.JFrame {
                     System.out.println("Pathsss: "+nodoSelecionado);
                     DefaultMutableTreeNode nodoOb = nodoSelecionado;
                     Nodo nodoArch = (Nodo) nodoOb.getUserObject();
-                    //System.out.println("Path: ");
+                    
 
                     if(nodoArch.getTipoDato().equals("ARCHIVO")){
                         abrirProyecto(nodoArch);
+                        AnalizadorLexico3 lexico = new AnalizadorLexico3(new StringReader(archivo.leerCSV(nodoArch.getPath())));
+                        AnalizadorSintactico3 sintactico = new AnalizadorSintactico3(lexico);
+                        sintactico.setVentana(VentanaInicio.this);
+                        try {
+                            sintactico.parse();
+                            excribirArea(sintactico.getTabla());
+                            escribirErrores(sintactico.getListaErrores());
+                        }catch(Exception s){
+                        }
                     }else{
                         JOptionPane.showMessageDialog(null, "La seleccion no es un archivo");
                     }
@@ -228,6 +238,25 @@ public class VentanaInicio extends javax.swing.JFrame {
             }
         });
         
+    }
+    private void excribirArea(Tabla tabla){
+        System.out.println("Giiaiiaiaiaia");
+        textAreaDatos.setText("");
+        for (int j = 0; j < tabla.getTabla().size(); j++) {
+                
+                for (int k = 0; k < tabla.getTabla().get(j).getRegistros().size()-1; k++) {
+                    textAreaDatos.setText(textAreaDatos.getText()+tabla.getTabla().get(j).getRegistros().get(k)+"\t\t");
+                }
+                textAreaDatos.setText(textAreaDatos.getText()+tabla.getTabla().get(j).getRegistros().get(tabla.getTabla().get(j).getRegistros().size()-1)+"\n");
+        }
+        
+    }
+    public void escribirErrores(ArrayList<Error> lista){
+        areaError.setText("616516");
+        System.out.println(lista.size());
+        for (int i = 0; i < lista.size(); i++) {
+            areaError.setText(areaError.getText()+lista.get(i).toString()+"\n");
+        }
     }
     
     private void modificarIde(String texto){
@@ -253,6 +282,10 @@ public class VentanaInicio extends javax.swing.JFrame {
         panelConsulta = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         textAreaConsulta = new javax.swing.JTextArea();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        areaError = new javax.swing.JTextArea();
+        labelErrores = new javax.swing.JLabel();
+        labelConsulta = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
@@ -313,17 +346,38 @@ public class VentanaInicio extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(textAreaConsulta);
 
+        areaError.setColumns(20);
+        areaError.setRows(5);
+        jScrollPane3.setViewportView(areaError);
+
+        labelErrores.setText("ERRORES");
+
+        labelConsulta.setText("Consultas");
+
         javax.swing.GroupLayout panelConsultaLayout = new javax.swing.GroupLayout(panelConsulta);
         panelConsulta.setLayout(panelConsultaLayout);
         panelConsultaLayout.setHorizontalGroup(
             panelConsultaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 980, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 980, Short.MAX_VALUE)
+            .addComponent(jScrollPane3)
+            .addGroup(panelConsultaLayout.createSequentialGroup()
+                .addGroup(panelConsultaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(labelConsulta)
+                    .addComponent(labelErrores))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         panelConsultaLayout.setVerticalGroup(
             panelConsultaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelConsultaLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE))
+                .addComponent(labelConsulta)
+                .addGap(5, 5, 5)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(labelErrores)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         getContentPane().add(panelConsulta, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 470, 980, 340));
@@ -378,7 +432,7 @@ public class VentanaInicio extends javax.swing.JFrame {
         AnalizadorLexico2 lexico = new AnalizadorLexico2(new StringReader(texto));
         
         AnalizadorSintactico2 sintactico = new AnalizadorSintactico2(lexico);
-        //sintactico.setVentana(this);
+        sintactico.setVentana(this);
         sintactico.setArbol((TreeNode) treeArbol.getModel().getRoot());
         try {
             sintactico.parse();
@@ -478,12 +532,16 @@ public class VentanaInicio extends javax.swing.JFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public javax.swing.JTextArea areaError;
     private javax.swing.JButton jButton1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JLabel labelConsulta;
+    private javax.swing.JLabel labelErrores;
     private javax.swing.JMenuItem menuAbrirProyecto;
     private javax.swing.JMenuItem menuCerrarProyecto;
     private javax.swing.JMenuItem menuCreaProyecto;

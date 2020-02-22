@@ -8,6 +8,7 @@ import archivos.Insercion;
 import archivos.Actualizar;
 import archivos.SeleccionColumna;
 import archivos.Tabla;
+import inicio.VentanaInicio;
 import java.io.StringReader;
 import java_cup.runtime.Symbol;
 import java.util.LinkedList;
@@ -22,6 +23,14 @@ parser code
 {:
     TreeNode nodoFin;
     ArrayList<Tabla> listaTablas;
+    ArrayList<Error> listaErrores = new ArrayList<>();
+    VentanaInicio ventana;
+    public void setVentana(VentanaInicio ventana){
+        this.ventana=ventana;
+    }
+    public VentanaInicio getVentana(){
+        return ventana;
+    }
 
     public void setLista(ArrayList<Tabla> listaTablas){
         System.out.println("Tmanio lisata: "+listaTablas.size());
@@ -56,9 +65,24 @@ parser code
     public void syntaError(Symbol s){
         this.s = s;
     }
+public void escribirErrores(Error lista){
+            ventana.areaError.setText(ventana.areaError.getText()+lista.toString()+"\n");
+        
+    }
+
     public Symbol getS(Symbol s){
         return this.s = s;
     }
+    public void setAccion(String tipo,String mensaje,String accion){
+            System.out.println(tipo+"         "+mensaje);
+        }
+
+        public void syntax_error(Symbol s){
+            Error e = new Error((String) s.value, "Sintactico", "Error Sintaxis token: " + s.right + " " + s.left + " " + s.value, s.right, s.left);
+            listaErrores.add(e);
+            escribirErrores(e);
+            setAccion("ERROR","Error Sintaxis token: " + s.right + " " + s.left + " " + s.value, "");
+        }
 
 
 :}
@@ -112,6 +136,7 @@ action code
         Nodo nodoS =(Nodo) nodoSelecionado.getUserObject();
         AnalizadorLexico3 lexico = new AnalizadorLexico3(new StringReader(archivo.leerCSV(nodoS.getPath())));
         AnalizadorSintactico3 sintactico = new AnalizadorSintactico3(lexico);
+        sintactico.setVentana(parser.getVentana());
         try {
             sintactico.parse();
             listaTablas.add(sintactico.getTabla());
@@ -125,7 +150,7 @@ action code
 :}
 
 //Declaraciones 
-terminal TEXTO, COMA,SELECCIONAR,FILTRAR,INSERTAR,ACTUALIZAR,ASIGNAR,ELIMINAR,VALORES,EN,AND,OR,PATH_ARCHIVO;
+terminal TEXTO, COMA,SELECCIONAR,FILTRAR,INSERTAR,ACTUALIZAR,ASIGNAR,ELIMINAR,VALORES,EN,AND,OR,PATH_ARCHIVO,ERROR;
 terminal PUNTO_COMA,PUNTO,IGUAL,COMILLAS,ASTERISCO,PARENTECIS_A,PARENTECIS_C,MENOR,MAYOR,MENOR_IGUAL,MAYOR_IGUAL,DIFERENTE;
 
 
@@ -144,7 +169,9 @@ start with INICIO;
 INICIO::= SELECCIONAR TIPO_SELECCIONAR
          |INSERTAR EN PATH_ARCHIVO:a {:verNombre((String)a);:} TIPO_INSERTAR
          |ACTUALIZAR EN PATH_ARCHIVO:a {:verNombre((String)a);:} ASIGNAR ASIGNAR_COLUMNA TIPO_ACTUALIZAR
-         |ELIMINAR EN TIPO_ELIMINAR;
+         |ELIMINAR EN TIPO_ELIMINAR
+         |error:e INICIO {:parser.syntax_error((Symbol)e);:} 
+         |error:e PUNTO_COMA FINALIZA {:parser.syntax_error((Symbol)e);:} ;
 
 TIPO_SELECCIONAR::= ASTERISCO EN PATH_ARCHIVO:a {:
     
@@ -189,13 +216,20 @@ LISTA_COLUMNAS_SELECT::= TEXTO:b COMA {:seleccionColumnas.add((String)b); System
 
 TIPO_FILTROS::= TEXTO OPERADORES TEXTO AND FILTRO_AND
                 |TEXTO OPERADORES TEXTO OR FILTRO_OR
-                |TEXTO OPERADORES TEXTO;
+                |TEXTO OPERADORES TEXTO
+                |TEXTO OPERADORES COMILLAS TEXTO COMILLAS AND FILTRO_AND
+                |TEXTO OPERADORES COMILLAS TEXTO COMILLAS OR FILTRO_OR
+                |TEXTO OPERADORES COMILLAS TEXTO COMILLAS;
 
 FILTRO_AND::= TEXTO OPERADORES TEXTO AND FILTRO_AND
-             |TEXTO OPERADORES TEXTO;
+             |TEXTO OPERADORES TEXTO
+             |TEXTO OPERADORES COMILLAS TEXTO COMILLAS AND FILTRO_AND
+             |TEXTO OPERADORES COMILLAS TEXTO COMILLAS;
 
-FILTRO_OR::=  TEXTO OPERADORES TEXTO OR FILTRO_OR
-             |TEXTO OPERADORES TEXTO;
+FILTRO_OR::=  TEXTO OPERADORES TEXTO AND FILTRO_OR
+             |TEXTO OPERADORES TEXTO
+             |TEXTO OPERADORES COMILLAS TEXTO COMILLAS AND FILTRO_OR
+             |TEXTO OPERADORES COMILLAS TEXTO COMILLAS;
 
 TIPO_INSERTAR::= PARENTECIS_A LISTA_COLUMNAS_INSERTAR PARENTECIS_C VALORES PARENTECIS_A LISTA_VALORES_INSERTAR PARENTECIS_C PUNTO_COMA {:
     

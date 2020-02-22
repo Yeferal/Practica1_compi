@@ -58,7 +58,7 @@ OR              {System.out.println("OR"); return new Symbol(Simbolos2.OR, yycol
     ">="        {System.out.println("mayor igual"); return new Symbol(Simbolos2.MAYOR_IGUAL , yycolumn, yyline, yytext());}
     "<>"        {System.out.println("diferente"); return new Symbol(Simbolos2.DIFERENTE , yycolumn, yyline, yytext());}
     {Texto}     {System.out.println("Texto"); return new Symbol(Simbolos2.TEXTO , yycolumn, yyline, yytext());}
-    .           {System.out.println("error: "+"Columna: "+yycolumn+" linea: "+ yyline);
+    .           {System.out.println("error: "+"Columna: "+yycolumn+" linea: "+ yyline); return new Symbol(Simbolos2.ERROR , yycolumn, yyline, yytext());
                 Error datos = new Error(yytext(),"Error Lexico","Simbolo invalido",yyline,yycolumn);
                 tablaErrorLexico.add(datos);}
     

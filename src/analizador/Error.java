@@ -5,6 +5,7 @@
  */
 package analizador;
 
+
 /**
  *
  * @author LENOVO-PC
@@ -12,7 +13,7 @@ package analizador;
 public class Error {
     String lexema, tipo,descripcion;
     int linea,columna;
-
+    
     public Error(String lexema, String tipo, String descripcion, int linea, int columna) {
         this.lexema = lexema;
         this.tipo = tipo;
@@ -21,8 +22,27 @@ public class Error {
         this.columna = columna;
     }
 
-    Error(String message) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public String getLexema() {
+        return lexema;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public int getLinea() {
+        return linea;
+    }
+
+    public int getColumna() {
+        return columna;
+    }
+    public String toString(){
+        return "Error: "+tipo+" "+descripcion+"--------->"+"Linea: "+linea+" Columna: "+columna;
     }
     
     
