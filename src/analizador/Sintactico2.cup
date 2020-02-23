@@ -8,6 +8,7 @@ import archivos.Insercion;
 import archivos.Actualizar;
 import archivos.TipoFiltro;
 import archivos.Filtrar;
+import archivos.FiltroOR;
 import archivos.SeleccionColumna;
 import archivos.Tabla;
 import inicio.VentanaInicio;
@@ -94,7 +95,9 @@ action code
     Actualizar actualizar = new Actualizar();
     SeleccionColumna seleccionColumna = new SeleccionColumna();
     Tabla tablaTemp;
+    Tabla completaTemp;
     Filtrar fil = new Filtrar();
+    FiltroOR filtroOr = new FiltroOR();
     TipoFiltro tipoFil = null;
     int tipoFilNumero;
 
@@ -150,6 +153,25 @@ action code
                         sintactico.parse();
                         fil = new Filtrar();
                         tablaTemp = fil.filtrarColumnas(tipoFil,sintactico.getTabla(),nodoS.getPath());
+                        completaTemp = tablaTemp;
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+        return null;
+    }
+
+    private Tabla FiltrarAnalizarCsvOr(){
+                    DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) parser.getArbol();
+                    Nodo nodoS =(Nodo) nodoSelecionado.getUserObject();
+                    AnalizadorLexico3 lexico = new AnalizadorLexico3(new StringReader(archivo.leerCSV(nodoS.getPath())));
+                    AnalizadorSintactico3 sintactico = new AnalizadorSintactico3(lexico);
+                    sintactico.setVentana(parser.getVentana());
+                    try {
+                        sintactico.parse();
+                        fil = new Filtrar();
+                        tablaTemp = filtroOr.filtrarColumnas(tipoFil,sintactico.getTabla(),nodoS.getPath(),new Tabla());
+                        completaTemp = filtroOr.getTablaEntra();
+                        System.out.println("TTT: "+completaTemp.getTabla().size());
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -222,13 +244,20 @@ PUNTO_COMA{:
 LISTA_COLUMNAS_SELECT::= TEXTO:b COMA {:seleccionColumnas.add((String)b); System.out.println("Informacion2: "+b);:} LISTA_COLUMNAS_SELECT
                         |TEXTO:c {:seleccionColumnas.add((String)c); System.out.println("Informacion1: "+c);:} ;
 
-TIPO_FILTROS::= TEXTO:c OPERADORES TEXTO:t {:
+TIPO_FILTROS::= TEXTO:c OPERADORES TEXTO:t AND {:
                 tipoFil= new TipoFiltro(tipoFilNumero,(String)t,(String)c);
                 if(tipoFil.isNumeric()){
                     FiltrarAnalizarCsv();
                 }  
-:} AND FILTRO_AND
-                |TEXTO OPERADORES TEXTO OR FILTRO_OR
+:} FILTRO_AND
+                |TEXTO:c OPERADORES TEXTO:t OR {:
+                tipoFil= new TipoFiltro(tipoFilNumero,(String)t,(String)c);
+                if(tipoFil.isNumeric()){
+                    System.out.println("TTT: HOLLLLLLLLLLLLA");
+                    FiltrarAnalizarCsvOr();
+                    System.out.println("TTT: "+tablaTemp.getTabla().size());
+                }  
+:} FILTRO_OR
                 |TEXTO:c OPERADORES TEXTO:t {:
                 tipoFil= new TipoFiltro(tipoFilNumero,(String)t,(String)c);
                 
@@ -237,12 +266,16 @@ TIPO_FILTROS::= TEXTO:c OPERADORES TEXTO:t {:
                     System.out.println("Entro en adn filtro");
                 }  
 :}
-                |TEXTO:c OPERADORES COMILLAS TEXTO:t COMILLAS {:
+                |TEXTO:c OPERADORES COMILLAS TEXTO:t COMILLAS AND {:
                 tipoFil= new TipoFiltro(tipoFilNumero,(String)t,(String)c);
                 System.out.println("Entro en comillas texto");
                     FiltrarAnalizarCsv();
-:} AND FILTRO_AND
-                |TEXTO OPERADORES COMILLAS TEXTO COMILLAS OR FILTRO_OR
+:} FILTRO_AND
+                |TEXTO:c OPERADORES COMILLAS TEXTO:t COMILLAS OR {:
+                tipoFil= new TipoFiltro(tipoFilNumero,(String)t,(String)c);
+                System.out.println("Entro en comillas texto");
+                    FiltrarAnalizarCsvOr();
+:} FILTRO_OR
                 |TEXTO:c OPERADORES COMILLAS TEXTO:t COMILLAS {:
                 tipoFil= new TipoFiltro(tipoFilNumero,(String)t,(String)c);
                 System.out.println("Entro en comillas texto");
@@ -299,10 +332,59 @@ FILTRO_AND::= TEXTO:c OPERADORES TEXTO:t {:
                     }  
 :};
 
-FILTRO_OR::=  TEXTO OPERADORES TEXTO AND FILTRO_OR
-             |TEXTO OPERADORES TEXTO
-             |TEXTO OPERADORES COMILLAS TEXTO COMILLAS AND FILTRO_OR
-             |TEXTO OPERADORES COMILLAS TEXTO COMILLAS;
+FILTRO_OR::=  TEXTO:c OPERADORES TEXTO:t {:
+                tipoFil= new TipoFiltro(tipoFilNumero,(String)t,(String)c);
+                    if(tipoFil.isNumeric()){
+                    DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) parser.getArbol();
+                    Nodo nodoS =(Nodo) nodoSelecionado.getUserObject();
+                    try {
+                        fil = new Filtrar();
+                        tablaTemp = filtroOr.filtrarColumnas(tipoFil,completaTemp,nodoS.getPath(),tablaTemp);
+                        completaTemp = filtroOr.getTablaEntra();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    } 
+                }  
+:} OR FILTRO_OR
+             |TEXTO:c OPERADORES TEXTO:t {:
+                tipoFil= new TipoFiltro(tipoFilNumero,(String)t,(String)c);
+                    if(tipoFil.isNumeric()){
+                    DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) parser.getArbol();
+                    Nodo nodoS =(Nodo) nodoSelecionado.getUserObject();
+                    try {
+                        fil = new Filtrar();
+                        tablaTemp = filtroOr.filtrarColumnas(tipoFil,completaTemp,nodoS.getPath(),tablaTemp);
+                        completaTemp = filtroOr.getTablaEntra();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    } 
+                }  
+:}
+             |TEXTO:c OPERADORES COMILLAS TEXTO:t COMILLAS {:
+                tipoFil= new TipoFiltro(tipoFilNumero,(String)t,(String)c);
+                    DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) parser.getArbol();
+                    Nodo nodoS =(Nodo) nodoSelecionado.getUserObject();
+                    try {
+                        fil = new Filtrar();
+                        tablaTemp = filtroOr.filtrarColumnas(tipoFil,completaTemp,nodoS.getPath(),tablaTemp);
+                        completaTemp = filtroOr.getTablaEntra();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }  
+:} OR FILTRO_OR
+             |TEXTO:c OPERADORES COMILLAS TEXTO:t COMILLAS  {:
+                tipoFil= new TipoFiltro(tipoFilNumero,(String)t,(String)c);
+                    DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) parser.getArbol();
+                    Nodo nodoS =(Nodo) nodoSelecionado.getUserObject();
+                    try {
+                        fil = new Filtrar();
+                        System.out.println("TTTOR: "+completaTemp.getTabla().size());
+                        tablaTemp = filtroOr.filtrarColumnas(tipoFil,completaTemp,nodoS.getPath(),tablaTemp);
+                        completaTemp = filtroOr.getTablaEntra();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }  
+:};
 
 TIPO_INSERTAR::= PARENTECIS_A LISTA_COLUMNAS_INSERTAR PARENTECIS_C VALORES PARENTECIS_A LISTA_VALORES_INSERTAR PARENTECIS_C PUNTO_COMA {:
     
