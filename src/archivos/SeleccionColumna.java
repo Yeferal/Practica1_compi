@@ -20,6 +20,11 @@ public class SeleccionColumna {
     private Tupla tupla;
     private Archivo archivo = new Archivo();
 
+    
+    public ArrayList<String> getListaColumnasL() {
+        return listaColumnasL;
+    }
+    
     public Tabla getTablaTemp() {
         return tablaTemp;
     }

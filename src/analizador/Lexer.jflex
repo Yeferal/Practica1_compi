@@ -1,10 +1,19 @@
 package analizador;
 import java_cup.runtime.*;
 import java.util.LinkedList;
+import inicio.VentanaInicio;
 
 %%
 %{
     //coidgo de usuario en sintaxis java
+    VentanaInicio ventana;
+    public void setVentana(VentanaInicio ventana){
+        this.ventana=ventana;
+    }
+    public void escribirErrores(Error lista){
+            ventana.areaError.setText(ventana.areaError.getText()+lista.toString()+"\n");
+        
+    }
 
     //public static LinkedList<Error> tablaErrorLexico = new LinkedList<Error>();
 %}
@@ -31,7 +40,7 @@ Palabra         = {Letra} {Letra}*
 Digito          = [0-9]
 Numero          = {Digito} {Digito}*
 Espacio         = [ \t\r\n]+
-
+Texto           = ({Palabra}|{Numero}|{Caracteres})+
 %%
 
 
@@ -45,12 +54,13 @@ identificador   = [a-zA-Z]+
 */
 
 
-PROYECTO   {System.out.println("proyecto"); return new Symbol(Simbolos.PROYECTO , yycolumn, yyline, yytext());}
+"<PROYECTO"   {System.out.println("proyecto"); return new Symbol(Simbolos.PROYECTO , yycolumn, yyline, yytext());}
 nombre     {System.out.println("nombre"); return new Symbol(Simbolos.NOMBRE , yycolumn, yyline, yytext());}
-ARCHIVO    {System.out.println("archivo"); return new Symbol(Simbolos.ARCHIVO , yycolumn, yyline, yytext());}
-CARPETA    {System.out.println("carpeta"); return new Symbol(Simbolos.CARPETA , yycolumn, yyline, yytext());}
+"<ARCHIVO"    {System.out.println("archivo"); return new Symbol(Simbolos.ARCHIVO , yycolumn, yyline, yytext());}
+"<CARPETA"    {System.out.println("carpeta"); return new Symbol(Simbolos.CARPETA , yycolumn, yyline, yytext());}
 ubicacion  {System.out.println("ubicacion"); return new Symbol(Simbolos.UBICACION , yycolumn, yyline, yytext());}
-
+"</CARPETA>" {System.out.println("carpeta CIERRE"); return new Symbol(Simbolos.CARPETA_CIERRE , yycolumn, yyline, yytext());}
+"</PROYECTO>" {System.out.println("proyecto CIERRE"); return new Symbol(Simbolos.PROYECTO_CIERRE , yycolumn, yyline, yytext());}
 
 <YYINITIAL> {
     {Espacio}    {/*Ignore*/}
@@ -62,14 +72,13 @@ ubicacion  {System.out.println("ubicacion"); return new Symbol(Simbolos.UBICACIO
     "\""         {System.out.println("comillas"); return new Symbol(Simbolos.COMILLAS , yycolumn, yyline, yytext());}
     "/"          {System.out.println("diagonal"); return new Symbol(Simbolos.DIAGONAL , yycolumn, yyline, yytext());}
     "="          {System.out.println("igual"); return new Symbol(Simbolos.IGUAL , yycolumn, yyline, yytext());}
-    ({Letra}":"|"*""\\"|"\\")(("\\"|{Palabra}|{Caracteres}|{Numero}))+         {System.out.println("ruta"); return new Symbol(Simbolos.RUTA , yycolumn, yyline, yytext());}
-    {Numero}     {System.out.println("numero"); return new Symbol(Simbolos.NUMERO , yycolumn, yyline, yytext());}
-    {Caracteres} {System.out.println("caracter"); return new Symbol(Simbolos.CARACTERES , yycolumn, yyline, yytext());}
-    {Palabra}    {System.out.println("palabra"); return new Symbol(Simbolos.PALABRA , yycolumn, yyline, yytext());}
+    ({Letra}":"|"*""\\"|"\\"|"/" )(("\\"|{Texto})|"/")+         {System.out.println("ruta"); return new Symbol(Simbolos.RUTA , yycolumn, yyline, yytext());}
+    
+    {Texto}    {System.out.println("palabra"); return new Symbol(Simbolos.PALABRA , yycolumn, yyline, yytext());}
     
     .            {System.out.println("error: "+"Columna: "+yycolumn+" linea: "+ yyline);
-                 /*Error datos = new Error(yytext(),"Error Lexico","Simbolo invalido",yyline,yycolumn);
-                 tablaErrorLexico.add(datos);*/}
+                 Error datos = new Error(yytext(),"Error Lexico","Simbolo invalido",yyline,yycolumn);
+                 escribirErrores(datos);}
     
 }
 

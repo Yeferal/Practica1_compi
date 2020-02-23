@@ -1,12 +1,19 @@
 package analizador;
 import java_cup.runtime.*;
 import java.util.LinkedList;
-
+import inicio.VentanaInicio;
 %%
 %{
     //coidgo de usuario en sintaxis java
 
-    public static LinkedList<Error> tablaErrorLexico = new LinkedList<Error>();
+    VentanaInicio ventana;
+    public void setVentana(VentanaInicio ventana){
+        this.ventana=ventana;
+    }
+    public void escribirErrores(Error lista){
+            ventana.areaError.setText(ventana.areaError.getText()+lista.toString()+"\n");
+        
+    }
 %}
 
     //directivas
@@ -58,8 +65,9 @@ OR              {System.out.println("OR"); return new Symbol(Simbolos2.OR, yycol
     ">="        {System.out.println("mayor igual"); return new Symbol(Simbolos2.MAYOR_IGUAL , yycolumn, yyline, yytext());}
     "<>"        {System.out.println("diferente"); return new Symbol(Simbolos2.DIFERENTE , yycolumn, yyline, yytext());}
     {Texto}     {System.out.println("Texto"); return new Symbol(Simbolos2.TEXTO , yycolumn, yyline, yytext());}
-    .           {System.out.println("error: "+"Columna: "+yycolumn+" linea: "+ yyline); return new Symbol(Simbolos2.ERROR , yycolumn, yyline, yytext());
+    .           {System.out.println("error: "+"Columna: "+yycolumn+" linea: "+ yyline); 
                 Error datos = new Error(yytext(),"Error Lexico","Simbolo invalido",yyline,yycolumn);
-                tablaErrorLexico.add(datos);}
+                 escribirErrores(datos);
+                return new Symbol(Simbolos2.ERROR , yycolumn, yyline, yytext());}
     
 }

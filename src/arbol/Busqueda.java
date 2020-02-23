@@ -23,7 +23,8 @@ public class Busqueda {
     }
     
     private void recorrer( TreeNode treenodo,String nombre){
-        System.out.println("Actual: "+treenodo.toString());
+        if(treenodo!=null){
+            System.out.println("Actual: "+treenodo.toString());
         TreeNode nodo = treenodo;
         Nodo nodoObjeto =null;
         if(nodo.getChildCount()>=0){
@@ -43,6 +44,7 @@ public class Busqueda {
                     
                 }
             }
+        }
         }
     }
     private boolean isNodoBuscar(Nodo nodo,String nombre){

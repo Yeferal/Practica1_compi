@@ -1,12 +1,20 @@
 package analizador;
 import java_cup.runtime.*;
 import java.util.LinkedList;
+import inicio.VentanaInicio;
 
 %%
 %{
     //coidgo de usuario en sintaxis java
-
-    //public static LinkedList<Error> tablaErrorLexico = new LinkedList<Error>();
+    
+    VentanaInicio ventana;
+    public void setVentana(VentanaInicio ventana){
+        this.ventana=ventana;
+    }
+public void escribirErrores(Error lista){
+            ventana.areaError.setText(ventana.areaError.getText()+lista.toString()+"\n");
+        
+    }
 %}
 
     //directivas
@@ -40,7 +48,10 @@ Texto           = ({Caracteres}|{Palabra}|{Numero}|{Espacio}|{Aa})+
     {Linea}      {/*System.out.println("Linea");*/ return new Symbol(Simbolos3.LINEA , yycolumn, yyline, yytext());}
     ","          {/*System.out.println("Coma");*/ return new Symbol(Simbolos3.COMA , yycolumn, yyline, yytext());}
     {Texto}      {/*System.out.println("Texto");*/ return new Symbol(Simbolos3.TEXTO , yycolumn, yyline, yytext());}
-    .            {/*System.out.println("error: "+"Columna: "+yycolumn+" linea: "+ yyline);*/ return new Symbol(Simbolos3.ERROR , yycolumn, yyline, yytext());}
+    .            {System.out.println("error: "+"Columna: "+yycolumn+" linea: "+ yyline); 
+                    Error datos = new Error(yytext(),"Error Lexico","Simbolo invalido",yyline,yycolumn);
+                 escribirErrores(datos);
+                return new Symbol(Simbolos3.ERROR , yycolumn, yyline, yytext());}
                  
     
 }

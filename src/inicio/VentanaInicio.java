@@ -70,11 +70,11 @@ public class VentanaInicio extends javax.swing.JFrame {
     }
     
     private void insertarTablaTexto(ArrayList<Tabla> lista){
-        //System.out.println("ta1: "+lista.size());
+        System.out.println("ta1: "+lista.size());
         for (int i = 0; i < lista.size(); i++) {
-            //System.out.println("ta2: "+lista.get(i).getTabla().size());
+            System.out.println("ta2: "+lista.get(i).getTabla().size());
             for (int j = 0; j < lista.get(i).getTabla().size(); j++) {
-                //System.out.println("ta3: "+lista.get(i).getTabla().get(j).getRegistros().size());
+                System.out.println("ta3: "+lista.get(i).getTabla().get(j).getRegistros().size());
                 for (int k = 0; k < lista.get(i).getTabla().get(j).getRegistros().size()-1; k++) {
                     textAreaDatos.setText(textAreaDatos.getText()+lista.get(i).getTabla().get(j).getRegistros().get(k)+"\t\t");
                 }
@@ -490,9 +490,10 @@ public class VentanaInicio extends javax.swing.JFrame {
             if(pathIde.substring(pathIde.length()-4,pathIde.length() ).equals(".ide") || pathIde.substring(pathIde.length()-4,pathIde.length() ).equals(".IDE")){
                 treeArbol.setModel(null);
                 AnalizadorLexico lexico = new AnalizadorLexico(new StringReader(archivo.leerArchivo(pathIde)));
-
+                lexico.setVentana(this);
                 AnalizadorSintactico sintactico = new AnalizadorSintactico(lexico);
-        
+                sintactico.setVentana(this);
+                
             try {
                 sintactico.parse();
 
@@ -503,7 +504,9 @@ public class VentanaInicio extends javax.swing.JFrame {
                 DefaultTreeModel noa =  (DefaultTreeModel) treeArbol.getModel();
                 
                 Busqueda bus = new Busqueda();
-                bus.insertarNodo((TreeNode) treeArbol.getModel().getRoot(), "achivo");
+                if(treeArbol!=null){
+                    bus.insertarNodo((TreeNode) treeArbol.getModel().getRoot(), "achivo");
+                }
                 
                 //System.out.println("Path: "+noa.getChildCount("[pro,achivo]"));
                 

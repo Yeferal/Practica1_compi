@@ -60,7 +60,7 @@ parser code
             System.out.println(tipo+"         "+mensaje);
         }
 
-        public void syntax_error(Symbol s){
+    public void syntax_error(Symbol s){
             Error e = new Error((String) s.value, "Sintactico", "Error Sintaxis token: " + s.right + " " + s.left + " " + s.value, s.right, s.left);
             listaErrores.add(e);
             escribirErrores(e);

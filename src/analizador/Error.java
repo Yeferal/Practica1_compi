@@ -44,6 +44,8 @@ public class Error {
     public String toString(){
         return "Error: "+tipo+" "+descripcion+"--------->"+"Linea: "+linea+" Columna: "+columna;
     }
-    
+    public String toStringL(){
+        return "Error: "+tipo+" "+descripcion+"--------->"+"Linea: "+linea+" Columna: "+columna;
+    }
     
 }

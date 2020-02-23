@@ -6,6 +6,8 @@ import archivos.Archivo;
 import archivos.Eliminar;
 import archivos.Insercion;
 import archivos.Actualizar;
+import archivos.TipoFiltro;
+import archivos.Filtrar;
 import archivos.SeleccionColumna;
 import archivos.Tabla;
 import inicio.VentanaInicio;
@@ -39,20 +41,6 @@ parser code
     public ArrayList<Tabla> getLista(){
         return listaTablas;
     }
-
-    /*public static LinkedList<Error> tablaErrorLexico = new LinkedList<Error>();
-    
-    public void syntaxError(Symbol s){
-    String lexema = s.value.toString();
-    int fila = s.right;
-    int columna = s.left;
-    
-    System.out.println("====== Error Sinstactico =====");
-    System.out.println("Lexema: "+lexema);
-    System.out.println("Fila: "+fila);
-    System.out.println("Columna: "+columna);
-
-    } */
     
     public void setArbol(TreeNode nodoFIN){
         this.nodoFin=nodoFIN;   
@@ -78,10 +66,12 @@ public void escribirErrores(Error lista){
         }
 
         public void syntax_error(Symbol s){
-            Error e = new Error((String) s.value, "Sintactico", "Error Sintaxis token: " + s.right + " " + s.left + " " + s.value, s.right, s.left);
-            listaErrores.add(e);
-            escribirErrores(e);
-            setAccion("ERROR","Error Sintaxis token: " + s.right + " " + s.left + " " + s.value, "");
+            if(s!=null){
+                Error e = new Error((String) s.value, "Sintactico", "Error Sintaxis token: " + s.right + " " + s.left + " " + s.value, s.right, s.left);
+                listaErrores.add(e);
+                escribirErrores(e);
+                setAccion("ERROR","Error Sintaxis token: " + s.right + " " + s.left + " " + s.value, "");
+            }
         }
 
 
@@ -103,6 +93,10 @@ action code
     Insercion insercion = new Insercion();
     Actualizar actualizar = new Actualizar();
     SeleccionColumna seleccionColumna = new SeleccionColumna();
+    Tabla tablaTemp;
+    Filtrar fil = new Filtrar();
+    TipoFiltro tipoFil = null;
+    int tipoFilNumero;
 
     public void verNombre(String path){
         String te = path;
@@ -144,8 +138,22 @@ action code
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        
-    
+    }
+
+    private Tabla FiltrarAnalizarCsv(){
+                    DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) parser.getArbol();
+                    Nodo nodoS =(Nodo) nodoSelecionado.getUserObject();
+                    AnalizadorLexico3 lexico = new AnalizadorLexico3(new StringReader(archivo.leerCSV(nodoS.getPath())));
+                    AnalizadorSintactico3 sintactico = new AnalizadorSintactico3(lexico);
+                    sintactico.setVentana(parser.getVentana());
+                    try {
+                        sintactico.parse();
+                        fil = new Filtrar();
+                        tablaTemp = fil.filtrarColumnas(tipoFil,sintactico.getTabla(),nodoS.getPath());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+        return null;
     }
 :}
 
@@ -177,7 +185,7 @@ TIPO_SELECCIONAR::= ASTERISCO EN PATH_ARCHIVO:a {:
     
         verNombre((String)a);
 
-:} FILTRAR TIPO_FILTROS PUNTO_COMA FINALIZA
+:} FILTRAR TIPO_FILTROS PUNTO_COMA {:listaTablas.add(tablaTemp); parser.setLista(listaTablas);:} FINALIZA
                     
                     |ASTERISCO EN PATH_ARCHIVO:a {:
     
@@ -193,7 +201,7 @@ TIPO_SELECCIONAR::= ASTERISCO EN PATH_ARCHIVO:a {:
 PUNTO_COMA{:
                 
 :} FINALIZA
-                    |LISTA_COLUMNAS_SELECT EN PATH_ARCHIVO:a {:verNombre((String)a);:} FILTRAR TIPO_FILTROS PUNTO_COMA FINALIZA
+                    |LISTA_COLUMNAS_SELECT EN PATH_ARCHIVO:a {:verNombre((String)a);:} FILTRAR TIPO_FILTROS PUNTO_COMA {:listaTablas.add(tablaTemp); parser.setLista(listaTablas);:} FINALIZA
                     |LISTA_COLUMNAS_SELECT EN PATH_ARCHIVO:a {:verNombre((String)a);:} PUNTO_COMA {:
 
                     if(parser.getArbol()!=null){
@@ -214,17 +222,82 @@ PUNTO_COMA{:
 LISTA_COLUMNAS_SELECT::= TEXTO:b COMA {:seleccionColumnas.add((String)b); System.out.println("Informacion2: "+b);:} LISTA_COLUMNAS_SELECT
                         |TEXTO:c {:seleccionColumnas.add((String)c); System.out.println("Informacion1: "+c);:} ;
 
-TIPO_FILTROS::= TEXTO OPERADORES TEXTO AND FILTRO_AND
+TIPO_FILTROS::= TEXTO:c OPERADORES TEXTO:t {:
+                tipoFil= new TipoFiltro(tipoFilNumero,(String)t,(String)c);
+                if(tipoFil.isNumeric()){
+                    FiltrarAnalizarCsv();
+                }  
+:} AND FILTRO_AND
                 |TEXTO OPERADORES TEXTO OR FILTRO_OR
-                |TEXTO OPERADORES TEXTO
-                |TEXTO OPERADORES COMILLAS TEXTO COMILLAS AND FILTRO_AND
+                |TEXTO:c OPERADORES TEXTO:t {:
+                tipoFil= new TipoFiltro(tipoFilNumero,(String)t,(String)c);
+                
+                if(tipoFil.isNumeric()){
+                    FiltrarAnalizarCsv();
+                    System.out.println("Entro en adn filtro");
+                }  
+:}
+                |TEXTO:c OPERADORES COMILLAS TEXTO:t COMILLAS {:
+                tipoFil= new TipoFiltro(tipoFilNumero,(String)t,(String)c);
+                System.out.println("Entro en comillas texto");
+                    FiltrarAnalizarCsv();
+:} AND FILTRO_AND
                 |TEXTO OPERADORES COMILLAS TEXTO COMILLAS OR FILTRO_OR
-                |TEXTO OPERADORES COMILLAS TEXTO COMILLAS;
+                |TEXTO:c OPERADORES COMILLAS TEXTO:t COMILLAS {:
+                tipoFil= new TipoFiltro(tipoFilNumero,(String)t,(String)c);
+                System.out.println("Entro en comillas texto");
+                    FiltrarAnalizarCsv();
+:};
 
-FILTRO_AND::= TEXTO OPERADORES TEXTO AND FILTRO_AND
-             |TEXTO OPERADORES TEXTO
-             |TEXTO OPERADORES COMILLAS TEXTO COMILLAS AND FILTRO_AND
-             |TEXTO OPERADORES COMILLAS TEXTO COMILLAS;
+FILTRO_AND::= TEXTO:c OPERADORES TEXTO:t {:
+                tipoFil= new TipoFiltro(tipoFilNumero,(String)t,(String)c);
+                if(tipoFil.isNumeric()){
+                    DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) parser.getArbol();
+                    Nodo nodoS =(Nodo) nodoSelecionado.getUserObject();
+                    try {
+                        fil = new Filtrar();
+                        tablaTemp = fil.filtrarColumnas(tipoFil,tablaTemp,nodoS.getPath());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }  
+:} AND FILTRO_AND
+
+             |TEXTO:c OPERADORES TEXTO:t {:
+                tipoFil= new TipoFiltro(tipoFilNumero,(String)t,(String)c);
+                if(tipoFil.isNumeric()){
+                    DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) parser.getArbol();
+                    Nodo nodoS =(Nodo) nodoSelecionado.getUserObject();
+                    try {
+                        fil = new Filtrar();
+                        tablaTemp = fil.filtrarColumnas(tipoFil,tablaTemp,nodoS.getPath());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }  
+:}
+             |TEXTO:c OPERADORES COMILLAS TEXTO:t COMILLAS {:
+                tipoFil= new TipoFiltro(tipoFilNumero,(String)t,(String)c);
+                    DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) parser.getArbol();
+                    Nodo nodoS =(Nodo) nodoSelecionado.getUserObject();
+                    try {
+                        fil = new Filtrar();
+                        tablaTemp = fil.filtrarColumnas(tipoFil,tablaTemp,nodoS.getPath());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }  
+:} AND FILTRO_AND
+             |TEXTO:c OPERADORES COMILLAS TEXTO:t COMILLAS {:
+                tipoFil= new TipoFiltro(tipoFilNumero,(String)t,(String)c);
+                    DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) parser.getArbol();
+                    Nodo nodoS =(Nodo) nodoSelecionado.getUserObject();
+                    try {
+                        fil = new Filtrar();
+                        tablaTemp = fil.filtrarColumnas(tipoFil,tablaTemp,nodoS.getPath());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }  
+:};
 
 FILTRO_OR::=  TEXTO OPERADORES TEXTO AND FILTRO_OR
              |TEXTO OPERADORES TEXTO
@@ -308,12 +381,12 @@ PUNTO_COMA {:
 :} FINALIZA 
                 |PATH_ARCHIVO FILTRAR TIPO_FILTROS PUNTO_COMA FINALIZA;
 
-OPERADORES::= IGUAL
-             |MENOR
-             |MAYOR
-             |MENOR_IGUAL
-             |MAYOR_IGUAL
-             |DIFERENTE;
+OPERADORES::= IGUAL {:tipoFilNumero=1;:}
+             |MENOR {:tipoFilNumero=3;:}
+             |MAYOR {:tipoFilNumero=2;:}
+             |MENOR_IGUAL {:tipoFilNumero=5;:}
+             |MAYOR_IGUAL {:tipoFilNumero=4;:}
+             |DIFERENTE {:tipoFilNumero=6;:};
 
 
 FINALIZA::= INICIO

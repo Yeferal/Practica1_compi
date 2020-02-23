@@ -14,6 +14,11 @@ parser code
 {:
 
     DefaultMutableTreeNode root;
+
+    VentanaInicio ventana;
+    public void setVentana(VentanaInicio ventana){
+        this.ventana=ventana;
+    }
     public DefaultMutableTreeNode getArbol(){
         return this.root;
     }
@@ -21,35 +26,31 @@ parser code
     public void setArbol(DefaultMutableTreeNode root){    
     this.root = root;
     }
-    /*
-    public VentanaInicio ventana;
-    public void setVentana(VentanaInicio ventana){
-    this.ventana = ventana;
     
+    public void escribirErrores(Error lista){
+            ventana.areaError.setText(ventana.areaError.getText()+lista.toString()+"\n");
+        
     }
-
-    public static LinkedList<Error> tablaErrorLexico = new LinkedList<Error>();
-    
-    public void syntaxError(Symbol s){
-    String lexema = s.value.toString();
-    int fila = s.right;
-    int columna = s.left;
-    
-    System.out.println("====== Error Sinstactico =====");
-    System.out.println("Lexema: "+lexema);
-    System.out.println("Fila: "+fila);
-    System.out.println("Columna: "+columna);
-
-    } */
-
     private Symbol s;
-    public void syntaError(Symbol s){
+    public void syntaxError(Symbol s){
         this.s = s;
     }
     public Symbol getS(Symbol s){
         return this.s = s;
     }
 
+    public void setAccion(String tipo,String mensaje,String accion){
+            System.out.println(tipo+"         "+mensaje);
+        }
+
+    public void syntax_error(Symbol s){
+            if(s!=null){
+                Error e = new Error((String) s.value, "Sintactico", "Error Sintaxis token: " + s.right + " " + s.left + " " + s.value, s.right, s.left);
+            
+                escribirErrores(e);
+                setAccion("ERROR","Error Sintaxis token: " + s.right + " " + s.left + " " + s.value, "");
+            }
+    }
 
 :}
 
@@ -69,7 +70,7 @@ action code
 :}
 
 //Declaraciones 
-terminal PROYECTO, NOMBRE,ARCHIVO,CARPETA,UBICACION, MENOR,MAYOR,COMILLAS,DIAGONAL,IGUAL,NUMERO,CARACTERES,PALABRA,RUTA,CSV,PUNTO;
+terminal PROYECTO, NOMBRE,ARCHIVO,CARPETA,UBICACION, MENOR,MAYOR,COMILLAS,DIAGONAL,IGUAL,NUMERO,CARACTERES,PALABRA,RUTA,CSV,PUNTO,CARPETA_CIERRE,PROYECTO_CIERRE;
 
 // declaracion no terminales
 non terminal INICIO, TIPO_ENTRADA,TIPO_ARCHIVO,TIPO_CARPETA,TIPO_CERRAR,PATHS,TIPO_PROYECTO,SEGUIDO;
@@ -82,9 +83,13 @@ start with INICIO;
 
 //Reglas Semanticas
 
-INICIO::= MENOR PROYECTO TIPO_PROYECTO;
+INICIO::= PROYECTO TIPO_PROYECTO
+          |error:e INICIO {:parser.syntax_error((Symbol)e);:} 
+          |error:e {:parser.syntax_error((Symbol)e);:}
+          |error:e SEGUIDO {:parser.syntax_error((Symbol)e);:};
 
-SEGUIDO::= MENOR TIPO_ENTRADA;
+SEGUIDO::= TIPO_CERRAR
+           |TIPO_ENTRADA;
 
 TIPO_ENTRADA::= ARCHIVO TIPO_ARCHIVO
                |CARPETA TIPO_CARPETA
@@ -102,7 +107,8 @@ SEGUIDO;
 
 TIPO_ARCHIVO::= NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra archivo: "+a); :} COMILLAS UBICACION IGUAL COMILLAS RUTA:b CSV:v {:System.out.println("ruta DE ARCHIVO: "+b+v); :} COMILLAS DIAGONAL MAYOR 
 {:
-    System.out.println("Tamanio "+listaNodos.size());
+    if(listaNodos!=null){
+        System.out.println("Tamanio "+listaNodos.size());
     Nodo nodo = new Nodo((String) b+v,(String) a,"ARCHIVO");
     DefaultMutableTreeNode nodoArchivo = listaNodos.get(listaNodos.size()-1);
     DefaultMutableTreeNode nodoArchivoTemp= new DefaultMutableTreeNode();
@@ -111,11 +117,14 @@ TIPO_ARCHIVO::= NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra a
     nodoArchivo.add(nodoArchivoTemp);
     listaNodos.add(nodoArchivo);
     //root.add(nodoArchivoTemp);
+    }
+    
 :}
 SEGUIDO;
 
 TIPO_CARPETA::= NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra carpeta: "+a); :} COMILLAS MAYOR 
 {:
+    if(listaNodos!=null){
     System.out.println("Tamanio "+listaNodos.size());
     Nodo nodo = new Nodo("",(String) a,"CARPETA");
     //DefaultMutableTreeNode nodoCarpeta = listaNodos.get(listaNodos.size()-1);
@@ -123,12 +132,14 @@ TIPO_CARPETA::= NOMBRE IGUAL COMILLAS PALABRA:a {: System.out.println("palabra c
     //listaNodos.remove(listaNodos.size()-1);
     nodoCarpeta.setUserObject(nodo);
     listaNodos.add(nodoCarpeta);
+    }
     
 :}
 SEGUIDO;
 
-TIPO_CERRAR::= PROYECTO MAYOR
+TIPO_CERRAR::= PROYECTO_CIERRE
 {:   
+    if(listaNodos!=null){
     System.out.println("Tamanio antes final "+listaNodos.size());
     DefaultMutableTreeNode arbolFinal = listaNodos.get(0);
     listaNodos.remove(listaNodos.size()-1);
@@ -136,11 +147,14 @@ TIPO_CERRAR::= PROYECTO MAYOR
     System.out.println("Tamanio final "+listaNodos.size());
     parser.setArbol(root);
     RESULT = root; 
+    }
+    
 
 :}
-              |CARPETA MAYOR 
+              |CARPETA_CIERRE
 {:
-    System.out.println("Tamanio1 "+listaNodos.size());
+    if(listaNodos!=null){
+        System.out.println("Tamanio1 "+listaNodos.size());
     DefaultMutableTreeNode nodoUltimo = listaNodos.get(listaNodos.size()-1);
     listaNodos.remove(listaNodos.size()-1);
     System.out.println("Tamanio2 "+listaNodos.size());
@@ -149,6 +163,8 @@ TIPO_CERRAR::= PROYECTO MAYOR
     System.out.println("Tamanio3 "+listaNodos.size());
     nodoPenultimo.add(nodoUltimo);
     listaNodos.add(nodoPenultimo);
+    }
+    
 
 :}
 SEGUIDO;
