@@ -10,6 +10,7 @@ import archivos.TipoFiltro;
 import archivos.Filtrar;
 import archivos.FiltroOR;
 import archivos.SeleccionColumna;
+import archivos.SeleccionColumnaFiltro;
 import archivos.Tabla;
 import inicio.VentanaInicio;
 import java.io.StringReader;
@@ -223,7 +224,23 @@ TIPO_SELECCIONAR::= ASTERISCO EN PATH_ARCHIVO:a {:
 PUNTO_COMA{:
                 
 :} FINALIZA
-                    |LISTA_COLUMNAS_SELECT EN PATH_ARCHIVO:a {:verNombre((String)a);:} FILTRAR TIPO_FILTROS PUNTO_COMA {:listaTablas.add(tablaTemp); parser.setLista(listaTablas);:} FINALIZA
+                    |LISTA_COLUMNAS_SELECT EN PATH_ARCHIVO:a {:verNombre((String)a);:} FILTRAR TIPO_FILTROS PUNTO_COMA {:
+
+                    if(parser.getArbol()!=null){
+                        DefaultMutableTreeNode nodoSelecionado = (DefaultMutableTreeNode) parser.getArbol();
+                        Nodo nodoS =(Nodo) nodoSelecionado.getUserObject();
+                        SeleccionColumnaFiltro selCF = new SeleccionColumnaFiltro();
+                        selCF.listarTabla(nodoS.getPath(),seleccionColumnas,tablaTemp);
+                        
+                        listaTablas.add(selCF.getTablaTemp());
+                        parser.setLista(listaTablas);
+                        seleccionColumnas.clear();
+                    }else{
+                        System.out.println("No existe el archivo");
+                    }
+
+
+:} FINALIZA
                     |LISTA_COLUMNAS_SELECT EN PATH_ARCHIVO:a {:verNombre((String)a);:} PUNTO_COMA {:
 
                     if(parser.getArbol()!=null){

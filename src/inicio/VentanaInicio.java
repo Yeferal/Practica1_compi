@@ -80,9 +80,7 @@ public class VentanaInicio extends javax.swing.JFrame {
                 }
                 textAreaDatos.setText(textAreaDatos.getText()+lista.get(i).getTabla().get(j).getRegistros().get(lista.get(i).getTabla().get(j).getRegistros().size()-1)+"\n");
             }
-            //textAreaDatos.setText(textAreaDatos.getText()+"\n---------------------------------------------------------------------------------------------------------------------------------------");
-            //textAreaDatos.setText(textAreaDatos.getText()+"---------------------------------------------------------------------------------------------------------------------------------------");
-            //textAreaDatos.setText(textAreaDatos.getText()+"---------------------------------------------------------------------------------------------------------------------------------------");
+            textAreaDatos.setText(textAreaDatos.getText()+"\n\nSE AGREGO LA CONSULTA HECHA");
         }
         
     }
@@ -240,7 +238,7 @@ public class VentanaInicio extends javax.swing.JFrame {
         
     }
     private void excribirArea(Tabla tabla){
-        System.out.println("Giiaiiaiaiaia");
+        
         textAreaDatos.setText("");
         for (int j = 0; j < tabla.getTabla().size(); j++) {
                 
@@ -252,7 +250,7 @@ public class VentanaInicio extends javax.swing.JFrame {
         
     }
     public void escribirErrores(ArrayList<Error> lista){
-        areaError.setText("616516");
+        areaError.setText("");
         System.out.println(lista.size());
         for (int i = 0; i < lista.size(); i++) {
             areaError.setText(areaError.getText()+lista.get(i).toString()+"\n");
@@ -286,7 +284,7 @@ public class VentanaInicio extends javax.swing.JFrame {
         areaError = new javax.swing.JTextArea();
         labelErrores = new javax.swing.JLabel();
         labelConsulta = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        botonIns = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         menuAbrirProyecto = new javax.swing.JMenuItem();
@@ -382,13 +380,13 @@ public class VentanaInicio extends javax.swing.JFrame {
 
         getContentPane().add(panelConsulta, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 470, 980, 340));
 
-        jButton1.setText("jButton1");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        botonIns.setText("jButton1");
+        botonIns.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                botonInsActionPerformed(evt);
             }
         });
-        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1300, 620, -1, -1));
+        getContentPane().add(botonIns, new org.netbeans.lib.awtextra.AbsoluteConstraints(1300, 620, -1, -1));
 
         jMenu1.setText("Archivo");
 
@@ -426,10 +424,11 @@ public class VentanaInicio extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void botonInsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonInsActionPerformed
         String texto = textAreaConsulta.getText();
         
-        AnalizadorLexico2 lexico = new AnalizadorLexico2(new StringReader(texto));
+        if(texto.substring(texto.length()-1,texto.length()).equals(";")){
+           AnalizadorLexico2 lexico = new AnalizadorLexico2(new StringReader(texto));
         
         AnalizadorSintactico2 sintactico = new AnalizadorSintactico2(lexico);
         sintactico.setVentana(this);
@@ -438,12 +437,14 @@ public class VentanaInicio extends javax.swing.JFrame {
             sintactico.parse();
             insertarTablaTexto(sintactico.getLista());
             
-//            textAreaDatos.setText(sintactico.s);
             
         } catch (Exception e) {
             e.printStackTrace();
+        } 
+        }else{
+            textAreaConsulta.setText(textAreaConsulta.getText()+"");
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_botonInsActionPerformed
 
     private void menuCreaProyectoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCreaProyectoActionPerformed
         String nombreProyecto = JOptionPane.showInputDialog("Escriba el nombre del Proyecto");
@@ -529,14 +530,14 @@ public class VentanaInicio extends javax.swing.JFrame {
     private void textAreaConsultaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textAreaConsultaKeyTyped
         char cajaCodigo = evt.getKeyChar();
         if(cajaCodigo==KeyEvent.VK_ENTER){
-            jButton1.doClick();
+            botonIns.doClick();
         }
     }//GEN-LAST:event_textAreaConsultaKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JTextArea areaError;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton botonIns;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
